@@ -5,5 +5,9 @@
       "memory": 128,
       "maxDuration": 15
     }
-  }
+  },
+  "routes": [
+    { "src": "/api/chat", "dest": "/api/chat.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
