@@ -2,7 +2,7 @@ const http = require('http');
 const https = require('https');
 
 const PORT = process.env.PORT || 3000;
-const API_KEY = process.env.ANTHROPIC_API_KEY;
+const API_KEY = process.env.MISTRAL_API_KEY;
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -12,7 +12,6 @@ const CORS_HEADERS = {
 };
 
 const server = http.createServer((req, res) => {
-  // CORS preflight
   if (req.method === 'OPTIONS') {
     res.writeHead(204, CORS_HEADERS);
     res.end();
@@ -30,21 +29,25 @@ const server = http.createServer((req, res) => {
         return;
       }
 
+      // Convertir le format Anthropic vers Mistral
+      const messages = [
+        { role: 'system', content: payload.system },
+        ...payload.messages
+      ];
+
       const data = JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'mistral-small-latest',
         max_tokens: 1000,
-        system: payload.system,
-        messages: payload.messages
+        messages: messages
       });
 
       const options = {
-        hostname: 'api.anthropic.com',
-        path: '/v1/messages',
+        hostname: 'api.mistral.ai',
+        path: '/v1/chat/completions',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': API_KEY,
-          'anthropic-version': '2023-06-01',
+          'Authorization': `Bearer ${API_KEY}`,
           'Content-Length': Buffer.byteLength(data)
         }
       };
@@ -53,8 +56,18 @@ const server = http.createServer((req, res) => {
         let result = '';
         apiRes.on('data', chunk => { result += chunk; });
         apiRes.on('end', () => {
-          res.writeHead(apiRes.statusCode, CORS_HEADERS);
-          res.end(result);
+          try {
+            const parsed = JSON.parse(result);
+            // Convertir la réponse Mistral vers le format Anthropic attendu par le frontend
+            const converted = {
+              content: [{ text: parsed.choices[0].message.content }]
+            };
+            res.writeHead(200, CORS_HEADERS);
+            res.end(JSON.stringify(converted));
+          } catch(e) {
+            res.writeHead(500, CORS_HEADERS);
+            res.end(JSON.stringify({ error: 'Parse error', raw: result }));
+          }
         });
       });
 
@@ -74,5 +87,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Clartée backend running on port ${PORT}`);
+  console.log(`Clartée backend (Mistral) running on port ${PORT}`);
 });
