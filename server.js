@@ -29,7 +29,6 @@ const server = http.createServer((req, res) => {
         return;
       }
 
-      // Convertir le format Anthropic vers Mistral
       const messages = [
         { role: 'system', content: payload.system },
         ...payload.messages
@@ -58,15 +57,19 @@ const server = http.createServer((req, res) => {
         apiRes.on('end', () => {
           try {
             const parsed = JSON.parse(result);
-            // Convertir la réponse Mistral vers le format Anthropic attendu par le frontend
-            const converted = {
-              content: [{ text: parsed.choices[0].message.content }]
-            };
+            // Vérification défensive de la structure
+            if (!parsed.choices || !parsed.choices[0] || !parsed.choices[0].message) {
+              res.writeHead(500, CORS_HEADERS);
+              res.end(JSON.stringify({ error: 'Unexpected Mistral response', raw: result }));
+              return;
+            }
+            const text = parsed.choices[0].message.content;
+            // Retourner au format attendu par le frontend
             res.writeHead(200, CORS_HEADERS);
-            res.end(JSON.stringify(converted));
+            res.end(JSON.stringify({ content: [{ text: text }] }));
           } catch(e) {
             res.writeHead(500, CORS_HEADERS);
-            res.end(JSON.stringify({ error: 'Parse error', raw: result }));
+            res.end(JSON.stringify({ error: 'Parse error: ' + e.message, raw: result.substring(0, 500) }));
           }
         });
       });
