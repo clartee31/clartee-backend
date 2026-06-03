@@ -1,8 +1,26 @@
 const http = require('http');
 const https = require('https');
+const fs = require('fs');
+const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.MISTRAL_API_KEY;
+const SYSTEM_PROMPT_TEMPLATE = require('./system_prompt');
+
+// Charge un fichier KB .md depuis le dossier /kb
+function loadKB(domain, theme) {
+  const filename = `${domain}_${theme}.md`.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+  const filepath = path.join(__dirname, 'kb', filename);
+  try {
+    return fs.readFileSync(filepath, 'utf8');
+  } catch (e) {
+    // Fallback : cherche juste par thème
+    const files = fs.readdirSync(path.join(__dirname, 'kb'));
+    const match = files.find(f => f.includes(theme.toLowerCase().replace(/\s+/g, '_')));
+    if (match) return fs.readFileSync(path.join(__dirname, 'kb', match), 'utf8');
+    return `Aucune base de connaissances trouvée pour : ${domain} / ${theme}`;
+  }
+}
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -29,8 +47,21 @@ const server = http.createServer((req, res) => {
         return;
       }
 
+      // Construire le prompt système avec la KB injectée
+      let systemPrompt;
+      if (payload.domain && payload.theme) {
+        // Charge la KB depuis le fichier .md
+        const kb = loadKB(payload.domain, payload.theme);
+        systemPrompt = SYSTEM_PROMPT_TEMPLATE.replace('{{KB}}', kb);
+      } else if (payload.system) {
+        // Compatibilité avec l'ancien format (KB inline depuis le frontend)
+        systemPrompt = payload.system;
+      } else {
+        systemPrompt = SYSTEM_PROMPT_TEMPLATE.replace('{{KB}}', 'Aucune base de connaissances fournie.');
+      }
+
       const messages = [
-        { role: 'system', content: payload.system },
+        { role: 'system', content: systemPrompt },
         ...payload.messages
       ];
 
@@ -57,14 +88,12 @@ const server = http.createServer((req, res) => {
         apiRes.on('end', () => {
           try {
             const parsed = JSON.parse(result);
-            // Vérification défensive de la structure
             if (!parsed.choices || !parsed.choices[0] || !parsed.choices[0].message) {
               res.writeHead(500, CORS_HEADERS);
               res.end(JSON.stringify({ error: 'Unexpected Mistral response', raw: result }));
               return;
             }
             const text = parsed.choices[0].message.content;
-            // Retourner au format attendu par le frontend
             res.writeHead(200, CORS_HEADERS);
             res.end(JSON.stringify({ content: [{ text: text }] }));
           } catch(e) {
