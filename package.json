@@ -1,11 +1,7 @@
 {
   "name": "clartee-backend",
-  "version": "1.0.0",
-  "description": "Backend proxy Clartée — API Anthropic",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
+  "version": "2.0.0",
+  "description": "Clartée backend — Vercel serverless",
   "engines": {
     "node": ">=18.0.0"
   }
