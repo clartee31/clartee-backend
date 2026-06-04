@@ -136,9 +136,47 @@
     .send-btn{width:40px;height:40px;border-radius:10px;background:var(--c-gold);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background .15s;flex-shrink:0;}
     .send-btn:hover{background:var(--c-gold-dark);}.send-btn:disabled{background:var(--c-warm);cursor:not-allowed;}
     .map-update-banner{background:#EAF5F2;border:1px solid var(--c-teal);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--c-teal);display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;}
+
+    /* LOGIN */
+    .login-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:var(--c-cream); z-index:1000; display:flex; align-items:center; justify-content:center; }
+    .login-box { background:white; border:1px solid var(--c-border); border-radius:20px; padding:2.5rem; width:100%; max-width:380px; box-shadow:0 20px 60px rgba(44,42,37,0.08); }
+    .login-logo { font-family:var(--font-display); font-size:1.8rem; font-weight:600; letter-spacing:-0.02em; margin-bottom:0.25rem; }
+    .login-logo span { color:var(--c-gold); }
+    .login-tagline { font-size:12px; color:var(--c-text-light); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:2rem; }
+    .login-title { font-family:var(--font-display); font-size:1.1rem; font-weight:500; margin-bottom:1.5rem; color:var(--c-text); }
+    .login-field { margin-bottom:1rem; }
+    .login-label { display:block; font-size:12px; font-weight:500; color:var(--c-text-mid); margin-bottom:0.4rem; letter-spacing:0.03em; }
+    .login-input { width:100%; padding:10px 14px; border:1px solid var(--c-border); border-radius:10px; font-size:14px; font-family:var(--font-body); outline:none; background:var(--c-cream); color:var(--c-text); transition:border-color .15s; }
+    .login-input:focus { border-color:var(--c-gold); }
+    .login-btn { width:100%; padding:12px; border-radius:10px; background:var(--c-gold); color:white; border:none; font-size:14px; font-family:var(--font-body); font-weight:500; cursor:pointer; transition:background .15s; margin-top:0.5rem; }
+    .login-btn:hover { background:var(--c-gold-dark); }
+    .login-btn:disabled { background:var(--c-warm); cursor:not-allowed; }
+    .login-error { font-size:13px; color:var(--c-rose); margin-top:0.75rem; text-align:center; min-height:20px; }
+    .login-footer { font-size:11px; color:var(--c-text-light); text-align:center; margin-top:1.5rem; }
   </style>
 </head>
 <body>
+
+  <!-- LOGIN OVERLAY -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <div class="login-logo">Clart<span>é</span>e</div>
+      <div class="login-tagline">Company knowledge</div>
+      <div class="login-title">Connectez-vous pour accéder à votre espace</div>
+      <div class="login-field">
+        <label class="login-label" for="loginInput">Identifiant</label>
+        <input class="login-input" id="loginInput" type="text" placeholder="Votre identifiant" autocomplete="username" onkeydown="handleLoginKey(event)">
+      </div>
+      <div class="login-field">
+        <label class="login-label" for="passwordInput">Mot de passe</label>
+        <input class="login-input" id="passwordInput" type="password" placeholder="Votre mot de passe" autocomplete="current-password" onkeydown="handleLoginKey(event)">
+      </div>
+      <button class="login-btn" id="loginBtn" onclick="doLogin()">Se connecter</button>
+      <div class="login-error" id="loginError"></div>
+      <div class="login-footer">Accès réservé — Clartée © 2026</div>
+    </div>
+  </div>
+
   <nav class="nav">
     <div><div class="nav-logo">Clart<span>é</span>e</div><div class="nav-sub">Company knowledge</div></div>
     <div class="nav-user"><div class="nav-avatar">A</div><span>Apprenant</span></div>
@@ -194,6 +232,39 @@
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
+
+    const BACKEND_LOGIN = 'https://clartee-backend-clartee-s-projects.vercel.app/api/login';
+    let currentUser = null;
+
+    async function doLogin() {
+      const login = document.getElementById('loginInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const btn = document.getElementById('loginBtn');
+      const err = document.getElementById('loginError');
+      if (!login || !password) { err.textContent = 'Veuillez remplir tous les champs.'; return; }
+      btn.disabled = true; btn.textContent = 'Connexion...'; err.textContent = '';
+      try {
+        const res = await fetch(BACKEND_LOGIN, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ login, password })
+        });
+        const data = await res.json();
+        if (!res.ok) { err.textContent = data.error || 'Identifiants incorrects.'; btn.disabled = false; btn.textContent = 'Se connecter'; return; }
+        currentUser = data;
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.querySelector('.nav-avatar').textContent = data.prenom.charAt(0).toUpperCase();
+        document.querySelector('.nav-user span').textContent = data.prenom;
+      } catch(e) {
+        err.textContent = 'Erreur de connexion. Réessayez.';
+        btn.disabled = false; btn.textContent = 'Se connecter';
+      }
+    }
+
+    function handleLoginKey(e) {
+      if (e.key === 'Enter') doLogin();
+    }
+
     const BACKEND='https://clartee-backend-clartee-s-projects.vercel.app/api/chat';
     const THEMES={
       concepts:{label:'Concepts & Théories',color:'gold',domain:'concepts',theme:'theories',nodes:[
