@@ -3,58 +3,114 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clartée — Company Knowledge</title>
+  <title>Clartée — SIGYS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    :root{--c-cream:#FAF7F2;--c-warm:#F0EBE1;--c-text:#2C2A25;--c-text-mid:#6B6760;--c-text-light:#9E9B95;--c-gold:#C4873A;--c-gold-light:#F5E6CF;--c-gold-dark:#8A5B22;--c-teal:#2D7D6F;--c-teal-light:#D4EDEA;--c-rose:#C45A5A;--c-rose-light:#F5DEDE;--c-blue:#3A6B9E;--c-blue-light:#D6E4F5;--c-border:rgba(44,42,37,0.1);--font-display:'Lora',Georgia,serif;--font-body:'DM Sans',sans-serif;}
+    :root{
+      --c-cream:#FAF7F2;--c-warm:#F0EBE1;--c-text:#2C2A25;--c-text-mid:#6B6760;--c-text-light:#9E9B95;
+      --c-gold:#C4873A;--c-gold-light:#F5E6CF;--c-gold-dark:#8A5B22;
+      --c-teal:#2D7D6F;--c-teal-light:#D4EDEA;--c-rose:#C45A5A;--c-rose-light:#F5DEDE;
+      --c-blue:#3A6B9E;--c-blue-light:#D6E4F5;--c-purple:#7B6FD4;--c-purple-light:#EEEDFE;
+      --c-green:#5B8A5A;--c-green-light:#EAF3DE;
+      --c-border:rgba(44,42,37,0.1);--font-display:'Lora',Georgia,serif;--font-body:'DM Sans',sans-serif;
+    }
     body{font-family:var(--font-body);color:var(--c-text);background:var(--c-cream);min-height:100vh;}
-    .nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--c-border);background:var(--c-cream);position:sticky;top:0;z-index:10;}
+
+    /* NAV */
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--c-border);background:var(--c-cream);position:sticky;top:0;z-index:100;}
+    .nav-left{display:flex;align-items:baseline;gap:12px;}
     .nav-logo{font-family:var(--font-display);font-size:1.4rem;font-weight:600;letter-spacing:-0.02em;}
     .nav-logo span{color:var(--c-gold);}
-    .nav-sub{font-size:12px;color:var(--c-text-light);letter-spacing:.08em;text-transform:uppercase;}
+    .nav-sub{font-size:11px;color:var(--c-text-light);letter-spacing:.08em;text-transform:uppercase;}
+    .nav-company{font-size:13px;color:var(--c-text-mid);padding:3px 10px;background:var(--c-warm);border-radius:20px;}
     .nav-user{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--c-text-mid);}
     .nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--c-gold-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--c-gold-dark);}
+
+    /* PAGES */
     .page{display:none;}.page.active{display:block;}
-    .domain-hero{padding:2.5rem 2rem 1.5rem;}
-    .domain-hero h1{font-family:var(--font-display);font-size:1.6rem;font-weight:500;line-height:1.4;max-width:560px;}
-    .domain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;padding:0 2rem 2rem;}
-    .domain-card{background:white;border:1px solid var(--c-border);border-radius:14px;padding:1.25rem;transition:all .2s;position:relative;}
-    .domain-card.clickable{cursor:pointer;}
-    .domain-card.clickable:hover{border-color:var(--c-gold);transform:translateY(-2px);box-shadow:0 8px 20px rgba(196,135,58,.12);}
+
+    /* LOGIN */
+    .login-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--c-cream);z-index:1000;display:flex;align-items:center;justify-content:center;}
+    .login-box{background:white;border:1px solid var(--c-border);border-radius:20px;padding:2.5rem;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(44,42,37,.08);}
+    .login-logo{font-family:var(--font-display);font-size:1.8rem;font-weight:600;letter-spacing:-0.02em;margin-bottom:.25rem;}
+    .login-logo span{color:var(--c-gold);}
+    .login-tagline{font-size:12px;color:var(--c-text-light);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2rem;}
+    .login-title{font-family:var(--font-display);font-size:1.1rem;font-weight:500;margin-bottom:1.5rem;}
+    .login-field{margin-bottom:1rem;}
+    .login-label{display:block;font-size:12px;font-weight:500;color:var(--c-text-mid);margin-bottom:.4rem;letter-spacing:.03em;}
+    .login-input{width:100%;padding:10px 14px;border:1px solid var(--c-border);border-radius:10px;font-size:14px;font-family:var(--font-body);outline:none;background:var(--c-cream);color:var(--c-text);transition:border-color .15s;}
+    .login-input:focus{border-color:var(--c-gold);}
+    .login-btn{width:100%;padding:12px;border-radius:10px;background:var(--c-gold);color:white;border:none;font-size:14px;font-family:var(--font-body);font-weight:500;cursor:pointer;transition:background .15s;margin-top:.5rem;}
+    .login-btn:hover{background:var(--c-gold-dark);}
+    .login-btn:disabled{background:var(--c-warm);cursor:not-allowed;}
+    .login-error{font-size:13px;color:var(--c-rose);margin-top:.75rem;text-align:center;min-height:20px;}
+    .login-footer{font-size:11px;color:var(--c-text-light);text-align:center;margin-top:1.5rem;}
+
+    /* PAGE 0 — ACCUEIL */
+    .home-hero{padding:2.5rem 2rem 1.5rem;}
+    .home-company{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--c-gold);margin-bottom:.4rem;}
+    .home-hero h1{font-family:var(--font-display);font-size:1.5rem;font-weight:500;line-height:1.4;max-width:600px;}
+    .domain-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.875rem;padding:0 2rem 2rem;}
+    .domain-card{background:white;border:1px solid var(--c-border);border-radius:14px;padding:1.1rem;transition:all .2s;position:relative;cursor:pointer;}
+    .domain-card:hover{border-color:var(--c-gold);transform:translateY(-2px);box-shadow:0 8px 20px rgba(196,135,58,.12);}
     .domain-card.locked{opacity:.5;cursor:not-allowed;}
+    .domain-card.locked:hover{transform:none;border-color:var(--c-border);box-shadow:none;}
     .domain-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
-    .domain-card.c1::before{background:var(--c-gold);}.domain-card.c2::before{background:#7B6FD4;}.domain-card.c3::before{background:var(--c-teal);}.domain-card.c4::before{background:var(--c-blue);}.domain-card.c5::before{background:var(--c-rose);}.domain-card.c6::before{background:#5B8A5A;}
-    .d-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:.75rem;}
-    .d-icon.c1{background:var(--c-gold-light);color:var(--c-gold-dark);}.d-icon.c2{background:#EEEDFE;color:#534AB7;}.d-icon.c3{background:var(--c-teal-light);color:var(--c-teal);}.d-icon.c4{background:var(--c-blue-light);color:var(--c-blue);}.d-icon.c5{background:var(--c-rose-light);color:var(--c-rose);}.d-icon.c6{background:#EAF3DE;color:#3B6D11;}
-    .d-title{font-family:var(--font-display);font-size:.9rem;font-weight:500;line-height:1.3;}
+    .domain-card.c1::before{background:var(--c-gold);}
+    .domain-card.c2::before{background:var(--c-teal);}
+    .domain-card.c3::before{background:var(--c-blue);}
+    .domain-card.c4::before{background:var(--c-purple);}
+    .d-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:.65rem;}
+    .d-icon.c1{background:var(--c-gold-light);color:var(--c-gold-dark);}
+    .d-icon.c2{background:var(--c-teal-light);color:var(--c-teal);}
+    .d-icon.c3{background:var(--c-blue-light);color:var(--c-blue);}
+    .d-icon.c4{background:var(--c-purple-light);color:var(--c-purple);}
+    .d-title{font-family:var(--font-display);font-size:.85rem;font-weight:500;line-height:1.3;color:var(--c-text);}
+    .d-desc{font-size:12px;color:var(--c-text-light);margin-top:.35rem;line-height:1.4;}
     .d-badge{display:inline-block;margin-top:.6rem;font-size:10px;padding:2px 8px;border-radius:20px;background:var(--c-gold-light);color:var(--c-gold-dark);border:1px solid rgba(196,135,58,.25);}
     .d-locked-badge{display:inline-block;margin-top:.6rem;font-size:10px;padding:2px 8px;border-radius:20px;background:var(--c-warm);color:var(--c-text-light);}
-    .domain-breadcrumb{padding:1rem 2rem 0;font-size:12px;color:var(--c-text-light);display:flex;align-items:center;gap:6px;}
-    .breadcrumb-item{cursor:pointer;transition:color .15s;}.breadcrumb-item:hover{color:var(--c-gold);}
-    .domain-header{padding:1.25rem 2rem 1rem;}
-    .domain-overtitle{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--c-gold);margin-bottom:.3rem;}
-    .domain-title{font-family:var(--font-display);font-size:1.5rem;font-weight:500;}
-    .themes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;padding:.5rem 2rem 2rem;}
-    .theme-card{background:white;border:1px solid var(--c-border);border-radius:16px;padding:1.25rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
-    .theme-card:hover{border-color:var(--c-gold);transform:translateY(-2px);box-shadow:0 8px 24px rgba(196,135,58,.12);}
+
+    /* PAGE 1 — THÈMES */
+    .breadcrumb{padding:.85rem 2rem 0;font-size:12px;color:var(--c-text-light);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .bc-item{cursor:pointer;transition:color .15s;}.bc-item:hover{color:var(--c-gold);}
+    .bc-sep{color:var(--c-text-light);}
+    .bc-current{color:var(--c-text-mid);font-weight:500;}
+    .domain-header{padding:1.25rem 2rem .75rem;}
+    .domain-overtitle{font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem;}
+    .domain-overtitle.c1{color:var(--c-gold);}
+    .domain-overtitle.c2{color:var(--c-teal);}
+    .domain-overtitle.c3{color:var(--c-blue);}
+    .domain-overtitle.c4{color:var(--c-purple);}
+    .domain-title{font-family:var(--font-display);font-size:1.4rem;font-weight:500;}
+    .themes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;padding:.5rem 2rem 2rem;}
+    .theme-card{background:white;border:1px solid var(--c-border);border-radius:14px;padding:1.1rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+    .theme-card:hover{border-color:var(--c-gold);transform:translateY(-2px);box-shadow:0 8px 20px rgba(196,135,58,.12);}
     .theme-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-    .theme-card.gold::before{background:var(--c-gold);}.theme-card.teal::before{background:var(--c-teal);}.theme-card.rose::before{background:var(--c-rose);}
-    .card-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:.75rem;}
-    .card-icon.gold{background:var(--c-gold-light);color:var(--c-gold-dark);}.card-icon.teal{background:var(--c-teal-light);color:var(--c-teal);}.card-icon.rose{background:var(--c-rose-light);color:var(--c-rose);}
-    .card-title{font-family:var(--font-display);font-size:.95rem;font-weight:500;margin-bottom:.6rem;}
-    .card-pills{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.9rem;}
-    .pill{font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid var(--c-border);color:var(--c-text-mid);}
+    .theme-card.c1::before{background:var(--c-gold);}
+    .theme-card.c2::before{background:var(--c-teal);}
+    .theme-card.c3::before{background:var(--c-blue);}
+    .theme-card.c4::before{background:var(--c-purple);}
+    .card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:.65rem;}
+    .card-icon.c1{background:var(--c-gold-light);color:var(--c-gold-dark);}
+    .card-icon.c2{background:var(--c-teal-light);color:var(--c-teal);}
+    .card-icon.c3{background:var(--c-blue-light);color:var(--c-blue);}
+    .card-icon.c4{background:var(--c-purple-light);color:var(--c-purple);}
+    .card-title{font-family:var(--font-display);font-size:.9rem;font-weight:500;margin-bottom:.5rem;}
+    .card-pills{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:.75rem;}
+    .pill{font-size:10px;padding:2px 7px;border-radius:20px;border:1px solid var(--c-border);color:var(--c-text-mid);}
     .card-progress{display:flex;align-items:center;gap:8px;}
     .progress-bar{flex:1;height:4px;background:var(--c-warm);border-radius:4px;overflow:hidden;}
     .progress-fill{height:100%;border-radius:4px;}
-    .progress-fill.gold{background:var(--c-gold);}.progress-fill.teal{background:var(--c-teal);}.progress-fill.rose{background:var(--c-rose);}
+    .progress-fill.c1{background:var(--c-gold);}
+    .progress-fill.c2{background:var(--c-teal);}
+    .progress-fill.c3{background:var(--c-blue);}
+    .progress-fill.c4{background:var(--c-purple);}
     .progress-label{font-size:11px;color:var(--c-text-light);white-space:nowrap;font-weight:500;}
-    .theme-breadcrumb{padding:.85rem 2rem 0;font-size:12px;color:var(--c-text-light);display:flex;align-items:center;gap:6px;}
-    .bc-item{cursor:pointer;transition:color .15s;}.bc-item:hover{color:var(--c-gold);}
-    .bc-current{color:var(--c-text-mid);font-weight:500;}
+
+    /* PAGE 2 — THÈME */
     .map-section{padding:1rem 2rem 0;}
     .map-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--c-text-light);margin-bottom:.75rem;font-weight:500;}
     .map-container{background:white;border:1px solid var(--c-border);border-radius:16px;padding:1.25rem;}
@@ -68,7 +124,7 @@
     .chat-avatar{width:32px;height:32px;border-radius:50%;background:var(--c-gold-light);display:flex;align-items:center;justify-content:center;font-size:16px;}
     .chat-name{font-size:14px;font-weight:500;}.chat-status{font-size:12px;color:var(--c-teal);}
     .status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--c-teal);margin-right:4px;}
-    .chat-messages{padding:1.25rem;display:flex;flex-direction:column;gap:1rem;max-height:480px;overflow-y:auto;}
+    .chat-messages{padding:1.25rem;display:flex;flex-direction:column;gap:1rem;max-height:420px;overflow-y:auto;}
     .msg{display:flex;gap:10px;align-items:flex-start;}.msg.user{flex-direction:row-reverse;}
     .msg-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:2px;}
     .msg-avatar.agent{background:var(--c-gold-light);color:var(--c-gold-dark);}
@@ -136,28 +192,11 @@
     .send-btn{width:40px;height:40px;border-radius:10px;background:var(--c-gold);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background .15s;flex-shrink:0;}
     .send-btn:hover{background:var(--c-gold-dark);}.send-btn:disabled{background:var(--c-warm);cursor:not-allowed;}
     .map-update-banner{background:#EAF5F2;border:1px solid var(--c-teal);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--c-teal);display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;}
-
-    /* LOGIN */
-    .login-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:var(--c-cream); z-index:1000; display:flex; align-items:center; justify-content:center; }
-    .login-box { background:white; border:1px solid var(--c-border); border-radius:20px; padding:2.5rem; width:100%; max-width:380px; box-shadow:0 20px 60px rgba(44,42,37,0.08); }
-    .login-logo { font-family:var(--font-display); font-size:1.8rem; font-weight:600; letter-spacing:-0.02em; margin-bottom:0.25rem; }
-    .login-logo span { color:var(--c-gold); }
-    .login-tagline { font-size:12px; color:var(--c-text-light); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:2rem; }
-    .login-title { font-family:var(--font-display); font-size:1.1rem; font-weight:500; margin-bottom:1.5rem; color:var(--c-text); }
-    .login-field { margin-bottom:1rem; }
-    .login-label { display:block; font-size:12px; font-weight:500; color:var(--c-text-mid); margin-bottom:0.4rem; letter-spacing:0.03em; }
-    .login-input { width:100%; padding:10px 14px; border:1px solid var(--c-border); border-radius:10px; font-size:14px; font-family:var(--font-body); outline:none; background:var(--c-cream); color:var(--c-text); transition:border-color .15s; }
-    .login-input:focus { border-color:var(--c-gold); }
-    .login-btn { width:100%; padding:12px; border-radius:10px; background:var(--c-gold); color:white; border:none; font-size:14px; font-family:var(--font-body); font-weight:500; cursor:pointer; transition:background .15s; margin-top:0.5rem; }
-    .login-btn:hover { background:var(--c-gold-dark); }
-    .login-btn:disabled { background:var(--c-warm); cursor:not-allowed; }
-    .login-error { font-size:13px; color:var(--c-rose); margin-top:0.75rem; text-align:center; min-height:20px; }
-    .login-footer { font-size:11px; color:var(--c-text-light); text-align:center; margin-top:1.5rem; }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN OVERLAY -->
+  <!-- LOGIN -->
   <div class="login-overlay" id="loginOverlay">
     <div class="login-box">
       <div class="login-logo">Clart<span>é</span>e</div>
@@ -177,35 +216,66 @@
     </div>
   </div>
 
+  <!-- NAV -->
   <nav class="nav">
-    <div><div class="nav-logo">Clart<span>é</span>e</div><div class="nav-sub">Company knowledge</div></div>
-    <div class="nav-user"><div class="nav-avatar">A</div><span>Apprenant</span></div>
+    <div class="nav-left">
+      <div><div class="nav-logo">Clart<span>é</span>e</div><div class="nav-sub">Company knowledge</div></div>
+      <div class="nav-company" id="navCompany" style="display:none">SIGYS</div>
+    </div>
+    <div class="nav-user"><div class="nav-avatar" id="navAvatar">?</div><span id="navPrenom">–</span></div>
   </nav>
 
+  <!-- PAGE 0 : ACCUEIL -->
   <div class="page active" id="page0">
-    <div class="domain-hero"><h1>Sur quel sujet souhaitez-vous développer vos connaissances aujourd'hui&nbsp;?</h1></div>
+    <div class="home-hero">
+      <div class="home-company">SIGYS — Jouets artisanaux en bois</div>
+      <h1>Sur quel sujet souhaitez-vous développer vos connaissances aujourd'hui&nbsp;?</h1>
+    </div>
     <div class="domain-grid">
-      <div class="domain-card c1 clickable" onclick="goPage1()"><div class="d-icon c1"><i class="ti ti-brain"></i></div><div class="d-title">Ingénierie de connaissances</div><div class="d-badge">Disponible</div></div>
-      <div class="domain-card c2 locked"><div class="d-icon c2"><i class="ti ti-school"></i></div><div class="d-title">Ingénierie de formation</div><div class="d-locked-badge">Bientôt disponible</div></div>
-      <div class="domain-card c3 locked"><div class="d-icon c3"><i class="ti ti-pencil"></i></div><div class="d-title">Ingénierie pédagogique</div><div class="d-locked-badge">Bientôt disponible</div></div>
-      <div class="domain-card c4 locked"><div class="d-icon c4"><i class="ti ti-checklist"></i></div><div class="d-title">Gestion de projet</div><div class="d-locked-badge">Bientôt disponible</div></div>
-      <div class="domain-card c5 locked"><div class="d-icon c5"><i class="ti ti-server"></i></div><div class="d-title">Déploiement LMS</div><div class="d-locked-badge">Bientôt disponible</div></div>
-      <div class="domain-card c6 locked"><div class="d-icon c6"><i class="ti ti-users"></i></div><div class="d-title">Recettage clients et utilisateurs</div><div class="d-locked-badge">Bientôt disponible</div></div>
+      <div class="domain-card c1" onclick="goPage1('onboarding')">
+        <div class="d-icon c1"><i class="ti ti-door-enter"></i></div>
+        <div class="d-title">Onboarding</div>
+        <div class="d-desc">Tout ce qu'un nouvel employé doit savoir pour être opérationnel rapidement.</div>
+        <div class="d-badge">Disponible</div>
+      </div>
+      <div class="domain-card c2" onclick="goPage1('ops')">
+        <div class="d-icon c2"><i class="ti ti-tools"></i></div>
+        <div class="d-title">Savoir-faire opérationnels</div>
+        <div class="d-desc">Matériaux, machines, fabrication et contrôle qualité en atelier.</div>
+        <div class="d-badge">Disponible</div>
+      </div>
+      <div class="domain-card c3 locked">
+        <div class="d-icon c3"><i class="ti ti-books"></i></div>
+        <div class="d-title">Catalogue produits</div>
+        <div class="d-desc">Gammes, caractéristiques et positionnement des jouets SIGYS.</div>
+        <div class="d-locked-badge">Bientôt disponible</div>
+      </div>
+      <div class="domain-card c4 locked">
+        <div class="d-icon c4"><i class="ti ti-award"></i></div>
+        <div class="d-title">Savoir-faire commercial</div>
+        <div class="d-desc">Vente, relation client et argumentaire produit.</div>
+        <div class="d-locked-badge">Bientôt disponible</div>
+      </div>
     </div>
   </div>
 
+  <!-- PAGE 1 : THÈMES -->
   <div class="page" id="page1">
-    <div class="domain-breadcrumb"><span class="breadcrumb-item" onclick="goPage0()">Accueil</span><span><i class="ti ti-chevron-right" style="font-size:10px"></i></span><span style="color:var(--c-text-mid);font-weight:500">Ingénierie de connaissances</span></div>
-    <div class="domain-header"><div class="domain-overtitle">Domaine — Ingénierie de la connaissance</div><div class="domain-title">Quel thème souhaitez-vous explorer&nbsp;?</div></div>
-    <div class="themes-grid">
-      <div class="theme-card gold" onclick="goPage2('concepts')"><div class="card-icon gold"><i class="ti ti-bulb"></i></div><div class="card-title">Concepts & Théories</div><div class="card-pills"><span class="pill">SECI</span><span class="pill">Polanyi</span><span class="pill">DIKW</span><span class="pill">CoP</span><span class="pill">Ba</span></div><div class="card-progress"><div class="progress-bar"><div class="progress-fill gold" id="prog-concepts" style="width:0%"></div></div><span class="progress-label" id="prog-concepts-lbl">0 %</span></div></div>
-      <div class="theme-card teal" onclick="goPage2('outils')"><div class="card-icon teal"><i class="ti ti-tools"></i></div><div class="card-title">Outils & Technologies</div><div class="card-pills"><span class="pill">Glean</span><span class="pill">Slite</span><span class="pill">Panorama</span></div><div class="card-progress"><div class="progress-bar"><div class="progress-fill teal" id="prog-outils" style="width:0%"></div></div><span class="progress-label" id="prog-outils-lbl">0 %</span></div></div>
-      <div class="theme-card rose" onclick="goPage2('methodes')"><div class="card-icon rose"><i class="ti ti-route"></i></div><div class="card-title">Méthodes & Processus</div><div class="card-pills"><span class="pill">KCS</span><span class="pill">AAR</span><span class="pill">Carto</span><span class="pill">SNA</span></div><div class="card-progress"><div class="progress-bar"><div class="progress-fill rose" id="prog-methodes" style="width:0%"></div></div><span class="progress-label" id="prog-methodes-lbl">0 %</span></div></div>
+    <div class="breadcrumb">
+      <span class="bc-item" onclick="goPage0()">Accueil</span>
+      <span class="bc-sep"><i class="ti ti-chevron-right" style="font-size:10px"></i></span>
+      <span class="bc-current" id="p1DomainLabel">–</span>
     </div>
+    <div class="domain-header">
+      <div class="domain-overtitle" id="p1Overtitle">–</div>
+      <div class="domain-title">Quel thème souhaitez-vous explorer&nbsp;?</div>
+    </div>
+    <div class="themes-grid" id="themesGrid"></div>
   </div>
 
+  <!-- PAGE 2 : APPRENTISSAGE -->
   <div class="page" id="page2">
-    <div class="theme-breadcrumb" id="themeBreadcrumb"></div>
+    <div class="breadcrumb" id="p2Breadcrumb"></div>
     <div class="map-section">
       <div class="map-label" id="mapLabel">Carte des connaissances</div>
       <div class="map-container">
@@ -232,10 +302,36 @@
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-
+    const BACKEND = 'https://clartee-backend-clartee-s-projects.vercel.app/api/chat';
     const BACKEND_LOGIN = 'https://clartee-backend-clartee-s-projects.vercel.app/api/login';
-    let currentUser = null;
+    let currentUser = null, draggedItem = null;
 
+    // ── DOMAINES & THÈMES ────────────────────────────────────────────────
+    const DOMAINS = {
+      onboarding: {
+        label: 'Onboarding', color: 'c1',
+        desc: 'Intégration des nouveaux employés',
+        themes: {
+          sigys:   { label: "L'entreprise SIGYS",         kb: 'onboarding_sigys',   pills: ['Histoire','Valeurs','Organisation'], nodes: ['hist','orga','valeurs'] },
+          regles:  { label: 'Règles & outils du quotidien', kb: 'onboarding_regles',  pills: ['Horaires','Outils','Contacts'],      nodes: ['horaires','outils','contacts'] },
+          qualite: { label: 'La culture qualité',          kb: 'onboarding_qualite', pills: ['Standards','Signalement','Contrôle'], nodes: ['culture','standards','signalement'] }
+        }
+      },
+      ops: {
+        label: 'Savoir-faire opérationnels', color: 'c2',
+        desc: 'Atelier, fabrication et qualité',
+        themes: {
+          materiaux:   { label: 'Matériaux & approvisionnement', kb: 'ops_materiaux',   pills: ['Bois','Peintures','Appro'],         nodes: ['essences','peintures','appro'] },
+          machines:    { label: 'Machines & outils',             kb: 'ops_machines',    pills: ['Équipements','Sécurité','Maintenance'], nodes: ['machines','securite','maintenance'] },
+          fabrication: { label: 'Techniques de fabrication',     kb: 'ops_fabrication', pills: ['Étapes','Assemblage','Finition'],   nodes: ['etapes','assemblage','finition'] },
+          qualite:     { label: 'Contrôle qualité',              kb: 'ops_qualite',     pills: ['Points contrôle','Défauts','Contrôle final'], nodes: ['points','defauts','final'] }
+        }
+      }
+    };
+
+    let currentDomain = null, currentThemeKey = null, nodeStates = {}, conversationHistory = [], messageCount = 0, isTyping = false;
+
+    // ── LOGIN ────────────────────────────────────────────────────────────
     async function doLogin() {
       const login = document.getElementById('loginInput').value.trim();
       const password = document.getElementById('passwordInput').value;
@@ -244,327 +340,350 @@
       if (!login || !password) { err.textContent = 'Veuillez remplir tous les champs.'; return; }
       btn.disabled = true; btn.textContent = 'Connexion...'; err.textContent = '';
       try {
-        const res = await fetch(BACKEND_LOGIN, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ login, password })
-        });
+        const res = await fetch(BACKEND_LOGIN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login, password }) });
         const data = await res.json();
         if (!res.ok) { err.textContent = data.error || 'Identifiants incorrects.'; btn.disabled = false; btn.textContent = 'Se connecter'; return; }
         currentUser = data;
         document.getElementById('loginOverlay').style.display = 'none';
-        document.querySelector('.nav-avatar').textContent = data.prenom.charAt(0).toUpperCase();
-        document.querySelector('.nav-user span').textContent = data.prenom;
-      } catch(e) {
-        err.textContent = 'Erreur de connexion. Réessayez.';
-        btn.disabled = false; btn.textContent = 'Se connecter';
+        document.getElementById('navAvatar').textContent = data.prenom.charAt(0).toUpperCase();
+        document.getElementById('navPrenom').textContent = data.prenom;
+        document.getElementById('navCompany').style.display = 'inline-block';
+      } catch(e) { err.textContent = 'Erreur de connexion. Réessayez.'; btn.disabled = false; btn.textContent = 'Se connecter'; }
+    }
+    function handleLoginKey(e) { if (e.key === 'Enter') doLogin(); }
+
+    // ── NAVIGATION ───────────────────────────────────────────────────────
+    function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+    function goPage0() { showPage('page0'); }
+
+    function goPage1(domainKey) {
+      currentDomain = domainKey;
+      const domain = DOMAINS[domainKey];
+      document.getElementById('p1DomainLabel').textContent = domain.label;
+      const ot = document.getElementById('p1Overtitle');
+      ot.textContent = 'Domaine — ' + domain.label;
+      ot.className = 'domain-overtitle ' + domain.color;
+
+      const grid = document.getElementById('themesGrid');
+      grid.innerHTML = '';
+      Object.entries(domain.themes).forEach(([key, theme]) => {
+        const card = document.createElement('div');
+        card.className = 'theme-card ' + domain.color;
+        card.innerHTML = `
+          <div class="card-icon ${domain.color}"><i class="ti ti-book"></i></div>
+          <div class="card-title">${theme.label}</div>
+          <div class="card-pills">${theme.pills.map(p => `<span class="pill">${p}</span>`).join('')}</div>
+          <div class="card-progress">
+            <div class="progress-bar"><div class="progress-fill ${domain.color}" id="prog-${domainKey}-${key}" style="width:0%"></div></div>
+            <span class="progress-label" id="prog-lbl-${domainKey}-${key}">0 %</span>
+          </div>`;
+        card.onclick = () => goPage2(domainKey, key);
+        grid.appendChild(card);
+      });
+      showPage('page1');
+    }
+
+    function goPage2(domainKey, themeKey) {
+      currentDomain = domainKey;
+      currentThemeKey = themeKey;
+      const domain = DOMAINS[domainKey];
+      const theme = domain.themes[themeKey];
+      nodeStates = {};
+      theme.nodes.forEach(n => { nodeStates[n] = 'locked'; });
+      conversationHistory = []; messageCount = 0;
+
+      document.getElementById('p2Breadcrumb').innerHTML =
+        `<span class="bc-item" onclick="goPage0()">Accueil</span>
+         <span class="bc-sep"><i class="ti ti-chevron-right" style="font-size:10px"></i></span>
+         <span class="bc-item" onclick="goPage1('${domainKey}')">${domain.label}</span>
+         <span class="bc-sep"><i class="ti ti-chevron-right" style="font-size:10px"></i></span>
+         <span class="bc-current">${theme.label}</span>`;
+      document.getElementById('mapLabel').textContent = `Carte des connaissances : ${theme.label}`;
+      renderMap(); clearMessages();
+      document.getElementById('quickReplies').innerHTML = '';
+      const input = document.getElementById('chatInput'); input.value = ''; input.oninput = updateSendBtn;
+      showPage('page2');
+      setTimeout(() => startConversation(), 200);
+    }
+
+    // ── CARTE SVG ────────────────────────────────────────────────────────
+    function renderMap() {
+      const theme = DOMAINS[currentDomain].themes[currentThemeKey];
+      const nodes = theme.nodes;
+      const W = 560, H = 100, RW = 110, RH = 36, R = 8;
+      const step = W / (nodes.length + 1);
+      const pos = {};
+      nodes.forEach((n, i) => { pos[n] = { x: step * (i + 1), y: 50 }; });
+
+      const sF = { locked: '#F0EBE1', partial: '#F5E6CF', done: '#D4EDEA' };
+      const sS = { locked: '#C8C6BF', partial: '#C4873A', done: '#2D7D6F' };
+      const sT = { locked: '#9E9B95', partial: '#8A5B22', done: '#2D7D6F' };
+
+      let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:${H}px">
+      <defs>
+        <marker id="ag" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#C8C6BF"/></marker>
+        <marker id="at" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#2D7D6F"/></marker>
+      </defs>`;
+
+      for (let i = 0; i < nodes.length - 1; i++) {
+        const a = pos[nodes[i]], b = pos[nodes[i+1]];
+        const done = nodeStates[nodes[i]] === 'done';
+        svg += `<line x1="${a.x + RW/2}" y1="${a.y}" x2="${b.x - RW/2}" y2="${b.y}" stroke="${done ? '#2D7D6F' : '#C8C6BF'}" stroke-width="1.5" ${done ? '' : 'stroke-dasharray="4,3"'} marker-end="url(#${done ? 'at' : 'ag'})"/>`;
       }
-    }
 
-    function handleLoginKey(e) {
-      if (e.key === 'Enter') doLogin();
-    }
-
-    const BACKEND='https://clartee-backend-clartee-s-projects.vercel.app/api/chat';
-    const THEMES={
-      concepts:{label:'Concepts & Théories',color:'gold',domain:'concepts',theme:'theories',nodes:[
-        {id:'epist',label:'Fondements épistémologiques',state:'locked'},
-        {id:'tacite',label:'Tacite / Explicite',state:'locked'},
-        {id:'seci',label:'Modèle SECI',state:'locked'},
-        {id:'ba',label:'Ba',state:'locked'},
-        {id:'cop',label:'Communautés de pratique',state:'locked'}
-      ]},
-      outils:{label:'Outils & Technologies',color:'teal',domain:'outils',theme:'technologies',nodes:[
-        {id:'panorama',label:'Panorama des outils KM',state:'locked'},
-        {id:'glean',label:'Glean',state:'locked'},
-        {id:'slite',label:'Slite',state:'locked'}
-      ]},
-      methodes:{label:'Méthodes & Processus',color:'rose',domain:'methodes',theme:'processus',nodes:[
-        {id:'kcs',label:'KCS',state:'locked'},
-        {id:'aar',label:'AAR',state:'locked'},
-        {id:'carto',label:'Cartographie',state:'locked'},
-        {id:'sna',label:'SNA',state:'locked'}
-      ]}
-    };
-
-    let currentTheme=null,conversationHistory=[],nodeStates={},isTyping=false,messageCount=0,draggedItem=null;
-
-    function goPage0(){showPage('page0');}
-    function goPage1(){showPage('page1');}
-    function goPage2(tid){showPage('page2');initTheme(tid);}
-    function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
-
-    function initTheme(themeId){
-      currentTheme=themeId;const theme=THEMES[themeId];
-      nodeStates={};theme.nodes.forEach(n=>{nodeStates[n.id]='locked';});
-      conversationHistory=[];messageCount=0;
-      const labels={concepts:'Concepts & théories',outils:'Outils & Technologies',methodes:'Méthodes & Processus'};
-      document.getElementById('themeBreadcrumb').innerHTML=`<span class="bc-item" onclick="goPage1()">Ingénierie de la connaissance</span><span style="color:var(--c-text-light)"><i class="ti ti-chevron-right" style="font-size:10px"></i></span><span class="bc-current">${labels[themeId]}</span>`;
-      document.getElementById('mapLabel').textContent=`Carte des connaissances : ${labels[themeId]}`;
-      renderMap();clearMessages();document.getElementById('quickReplies').innerHTML='';
-      const input=document.getElementById('chatInput');input.value='';input.oninput=updateSendBtn;
-      setTimeout(()=>startConversation(),200);
-    }
-
-    function getPositions(tid){
-      if(tid==='concepts')return{epist:{x:90,y:45},tacite:{x:90,y:115},seci:{x:270,y:80},ba:{x:450,y:45},cop:{x:450,y:115}};
-      if(tid==='outils')return{panorama:{x:90,y:75},glean:{x:300,y:40},slite:{x:300,y:110}};
-      const t=THEMES[tid];const s=520/(t.nodes.length+1);const p={};t.nodes.forEach((n,i)=>{p[n.id]={x:s*(i+1),y:75};});return p;
-    }
-    function getEdges(tid){
-      if(tid==='concepts')return[['epist','seci'],['tacite','seci'],['seci','ba'],['seci','cop']];
-      if(tid==='outils')return[['panorama','glean'],['panorama','slite']];
-      return[['kcs','aar'],['aar','carto'],['carto','sna']];
-    }
-
-    function renderMap(){
-      const theme=THEMES[currentTheme];const pos=getPositions(currentTheme);const edges=getEdges(currentTheme);
-      const W=560,H=165,RW=108,RH=36,R=8;
-      const sF={locked:'#F0EBE1',partial:'#F5E6CF',done:'#D4EDEA'};
-      const sS={locked:'#C8C6BF',partial:'#C4873A',done:'#2D7D6F'};
-      const sT={locked:'#9E9B95',partial:'#8A5B22',done:'#2D7D6F'};
-      let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:${H}px"><defs><marker id="ag" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#C8C6BF"/></marker><marker id="ap" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#C4873A"/></marker><marker id="at" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#2D7D6F"/></marker></defs>`;
-      edges.forEach(([f,t])=>{
-        const a=pos[f],b=pos[t];if(!a||!b)return;
-        const fs=nodeStates[f]||'locked';
-        const color=fs==='done'?'#2D7D6F':fs==='partial'?'#C4873A':'#C8C6BF';
-        const marker=fs==='done'?'at':fs==='partial'?'ap':'ag';
-        const dash=fs==='locked'?'stroke-dasharray="4,3"':'';
-        const angle=Math.atan2(b.y-a.y,b.x-a.x);
-        const sx=a.x+(RW/2)*Math.cos(angle),sy=a.y+(RH/2)*Math.sin(angle);
-        const ex=b.x-(RW/2)*Math.cos(angle),ey=b.y-(RH/2)*Math.sin(angle);
-        svg+=`<line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="${color}" stroke-width="1.5" ${dash} marker-end="url(#${marker})"/>`;
+      nodes.forEach(n => {
+        const { x, y } = pos[n];
+        const state = nodeStates[n] || 'locked';
+        const label = n.charAt(0).toUpperCase() + n.slice(1).replace(/_/g, ' ');
+        svg += `<g>
+          <rect x="${x-RW/2}" y="${y-RH/2}" width="${RW}" height="${RH}" rx="${R}" ry="${R}" fill="${sF[state]}" stroke="${sS[state]}" stroke-width="1.5"/>
+          <text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="10" font-family="DM Sans,sans-serif" fill="${sT[state]}" font-weight="500">${label}</text>
+        </g>`;
       });
-      theme.nodes.forEach(n=>{
-        const{x,y}=pos[n.id];const state=nodeStates[n.id]||'locked';
-        const words=n.label.split(' ');let l1=n.label,l2='';
-        if(n.label.length>13){const m=Math.ceil(words.length/2);l1=words.slice(0,m).join(' ');l2=words.slice(m).join(' ');}
-        svg+=`<g><rect x="${x-RW/2}" y="${y-RH/2}" width="${RW}" height="${RH}" rx="${R}" ry="${R}" fill="${sF[state]}" stroke="${sS[state]}" stroke-width="1.5"/>`;
-        if(l2){svg+=`<text x="${x}" y="${y-7}" text-anchor="middle" dominant-baseline="middle" font-size="9.5" font-family="DM Sans,sans-serif" fill="${sT[state]}" font-weight="500">${l1}</text><text x="${x}" y="${y+7}" text-anchor="middle" dominant-baseline="middle" font-size="9.5" font-family="DM Sans,sans-serif" fill="${sT[state]}" font-weight="500">${l2}</text>`;}
-        else{svg+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="9.5" font-family="DM Sans,sans-serif" fill="${sT[state]}" font-weight="500">${l1}</text>`;}
-        svg+=`</g>`;
+      svg += `</svg>`;
+      document.getElementById('mapSvgWrap').innerHTML = svg;
+    }
+
+    function applyLevels(levels) {
+      if (!levels) return;
+      const theme = DOMAINS[currentDomain].themes[currentThemeKey];
+      // Mapper les concept_ids reçus vers les nodes du thème
+      Object.entries(levels).forEach(([id, state]) => {
+        const idx = parseInt(id) - 1;
+        if (idx >= 0 && idx < theme.nodes.length) nodeStates[theme.nodes[idx]] = state;
+        else if (theme.nodes.includes(id)) nodeStates[id] = state;
       });
-      svg+=`</svg>`;
-      document.getElementById('mapSvgWrap').innerHTML=svg;
+      renderMap(); updateProgress();
     }
 
-    function applyLevels(levels){if(!levels)return;Object.entries(levels).forEach(([id,s])=>{nodeStates[id]=s;});renderMap();updateProgress();}
-    function clearMessages(){document.getElementById('chatMessages').innerHTML='';}
+    // ── CHAT ─────────────────────────────────────────────────────────────
+    function clearMessages() { document.getElementById('chatMessages').innerHTML = ''; }
 
-    function addMessage(role,content){
-      const msgs=document.getElementById('chatMessages');
-      const div=document.createElement('div');div.className=`msg ${role}`;
-      const av=document.createElement('div');av.className=`msg-avatar ${role==='agent'?'agent':'user-av'}`;av.textContent=role==='agent'?'✦':'A';
-      const bubble=document.createElement('div');bubble.className='msg-bubble';
-      bubble.innerHTML=typeof marked!=='undefined'?marked.parse(content):content;
-      div.appendChild(av);div.appendChild(bubble);msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+    function addMessage(role, content) {
+      const msgs = document.getElementById('chatMessages');
+      const div = document.createElement('div'); div.className = `msg ${role}`;
+      const av = document.createElement('div'); av.className = `msg-avatar ${role === 'agent' ? 'agent' : 'user-av'}`; av.textContent = role === 'agent' ? '✦' : currentUser?.prenom?.charAt(0) || 'A';
+      const bubble = document.createElement('div'); bubble.className = 'msg-bubble';
+      bubble.innerHTML = typeof marked !== 'undefined' ? marked.parse(content) : content;
+      div.appendChild(av); div.appendChild(bubble); msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
     }
 
-    function addArtifact(el){
-      const msgs=document.getElementById('chatMessages');
-      const div=document.createElement('div');div.className='msg agent';
-      const av=document.createElement('div');av.className='msg-avatar agent';av.textContent='✦';
-      div.appendChild(av);div.appendChild(el);msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+    function addArtifact(el) {
+      const msgs = document.getElementById('chatMessages');
+      const div = document.createElement('div'); div.className = 'msg agent';
+      const av = document.createElement('div'); av.className = 'msg-avatar agent'; av.textContent = '✦';
+      div.appendChild(av); div.appendChild(el); msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
     }
 
-    function showTyping(){
-      const msgs=document.getElementById('chatMessages');
-      const div=document.createElement('div');div.className='msg agent';div.id='typingIndicator';
-      const av=document.createElement('div');av.className='msg-avatar agent';av.textContent='✦';
-      const dots=document.createElement('div');dots.className='typing-dots';dots.innerHTML='<span></span><span></span><span></span>';
-      div.appendChild(av);div.appendChild(dots);msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+    function showTyping() {
+      const msgs = document.getElementById('chatMessages');
+      const div = document.createElement('div'); div.className = 'msg agent'; div.id = 'typingIndicator';
+      const av = document.createElement('div'); av.className = 'msg-avatar agent'; av.textContent = '✦';
+      const dots = document.createElement('div'); dots.className = 'typing-dots'; dots.innerHTML = '<span></span><span></span><span></span>';
+      div.appendChild(av); div.appendChild(dots); msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
     }
-    function hideTyping(){const t=document.getElementById('typingIndicator');if(t)t.remove();}
+    function hideTyping() { const t = document.getElementById('typingIndicator'); if (t) t.remove(); }
 
-    function setQuickReplies(opts){
-      const qr=document.getElementById('quickReplies');qr.innerHTML='';
-      opts.forEach(opt=>{const btn=document.createElement('button');btn.className='quick-btn';btn.textContent=opt;btn.onclick=()=>{qr.innerHTML='';document.getElementById('chatInput').value=opt;sendMessage();};qr.appendChild(btn);});
-    }
-
-    function updateSendBtn(){const val=document.getElementById('chatInput').value.trim();document.getElementById('sendBtn').disabled=val.length===0||isTyping;}
-    function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(!document.getElementById('sendBtn').disabled)sendMessage();}}
-
-    function startConversation(){
-      addMessage('agent','Bienvenue ! Je vais d\'abord évaluer votre niveau sur ce thème. Prêt ?');
-      setQuickReplies(['Oui, évaluez mon niveau','Je préfère commencer directement']);
+    function setQuickReplies(opts) {
+      const qr = document.getElementById('quickReplies'); qr.innerHTML = '';
+      opts.forEach(opt => {
+        const btn = document.createElement('button'); btn.className = 'quick-btn'; btn.textContent = opt;
+        btn.onclick = () => { qr.innerHTML = ''; document.getElementById('chatInput').value = opt; sendMessage(); };
+        qr.appendChild(btn);
+      });
     }
 
-    async function callBackend(messages){
-      const theme=THEMES[currentTheme];
-      const response=await fetch(BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domain:theme.domain,theme:theme.theme,messages})});
-      if(!response.ok){const e=await response.json().catch(()=>({}));throw new Error(e?.error||`HTTP ${response.status}`);}
-      const data=await response.json();
+    function updateSendBtn() { const val = document.getElementById('chatInput').value.trim(); document.getElementById('sendBtn').disabled = val.length === 0 || isTyping; }
+    function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!document.getElementById('sendBtn').disabled) sendMessage(); } }
+
+    function startConversation() {
+      const theme = DOMAINS[currentDomain].themes[currentThemeKey];
+      addMessage('agent', `Bienvenue sur le thème **${theme.label}**. Je vais d'abord évaluer votre niveau avant de commencer. Prêt ?`);
+      setQuickReplies(['Oui, évaluez mon niveau', 'Je préfère commencer directement']);
+    }
+
+    async function callBackend(messages) {
+      const theme = DOMAINS[currentDomain].themes[currentThemeKey];
+      const response = await fetch(BACKEND, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain: currentDomain, theme: theme.kb, messages })
+      });
+      if (!response.ok) { const e = await response.json().catch(() => ({})); throw new Error(e?.error || `HTTP ${response.status}`); }
+      const data = await response.json();
       return data.content[0].text.trim();
     }
 
-    async function sendMessage(){
-      const input=document.getElementById('chatInput');const text=input.value.trim();if(!text||isTyping)return;
-      document.getElementById('quickReplies').innerHTML='';
-      addMessage('user',text);input.value='';updateSendBtn();
-      isTyping=true;document.getElementById('sendBtn').disabled=true;messageCount++;
-      conversationHistory.push({role:'user',content:text});showTyping();
-      try{
-        const raw=await callBackend(conversationHistory);
-        hideTyping();conversationHistory.push({role:'assistant',content:raw});
+    async function sendMessage() {
+      const input = document.getElementById('chatInput'); const text = input.value.trim();
+      if (!text || isTyping) return;
+      document.getElementById('quickReplies').innerHTML = '';
+      addMessage('user', text); input.value = ''; updateSendBtn();
+      isTyping = true; document.getElementById('sendBtn').disabled = true; messageCount++;
+      conversationHistory.push({ role: 'user', content: text }); showTyping();
+      try {
+        const raw = await callBackend(conversationHistory);
+        hideTyping(); conversationHistory.push({ role: 'assistant', content: raw });
         handleResponse(raw);
-      }catch(err){hideTyping();addMessage('agent',`Erreur : ${err.message}`);}
-      isTyping=false;updateSendBtn();
+      } catch(err) { hideTyping(); addMessage('agent', `Erreur : ${err.message}`); }
+      isTyping = false; updateSendBtn();
     }
 
-    function handleResponse(raw){
-      let parsed=null;
-      try{const m=raw.match(/\{[\s\S]*\}/);if(m)parsed=JSON.parse(m[0]);}catch(e){}
-      if(!parsed){addMessage('agent',raw);if(messageCount%4===0)setQuickReplies(['Un exercice','Concept suivant','Approfondir']);return;}
-      if(parsed.type==='qcm')renderQCM(parsed);
-      else if(parsed.type==='usecase')renderUseCase(parsed);
-      else if(parsed.type==='dragdrop')renderDragDrop(parsed);
-      else if(parsed.type==='scale')renderScale(parsed);
-      else if(parsed.type==='map_update'){
-        addMessage('agent',parsed.message);
-        if(parsed.acquired){nodeStates[parsed.acquired]='done';renderMap();updateProgress();showMapBanner();}
-        if(parsed.levels){applyLevels(parsed.levels);showMapBanner();}
-      } else addMessage('agent',raw);
+    function handleResponse(raw) {
+      let parsed = null;
+      try { const m = raw.match(/\{[\s\S]*\}/); if (m) parsed = JSON.parse(m[0]); } catch(e) {}
+      if (!parsed) { addMessage('agent', raw); if (messageCount % 4 === 0) setQuickReplies(['Un exercice', 'Concept suivant', 'Approfondir']); return; }
+      if (parsed.type === 'qcm') renderQCM(parsed);
+      else if (parsed.type === 'usecase') renderUseCase(parsed);
+      else if (parsed.type === 'dragdrop') renderDragDrop(parsed);
+      else if (parsed.type === 'scale') renderScale(parsed);
+      else if (parsed.type === 'map_update') {
+        addMessage('agent', parsed.message);
+        if (parsed.acquired) {
+          const theme = DOMAINS[currentDomain].themes[currentThemeKey];
+          if (theme.nodes.includes(parsed.acquired)) nodeStates[parsed.acquired] = 'done';
+          renderMap(); updateProgress(); showMapBanner();
+        }
+        if (parsed.levels) { applyLevels(parsed.levels); showMapBanner(); }
+      } else addMessage('agent', raw);
     }
 
-    function renderQCM(data){
-      const wrap=document.createElement('div');wrap.className='artifact';
-      const lbl=document.createElement('div');lbl.className='artifact-label';lbl.textContent='Question';wrap.appendChild(lbl);
-      const q=document.createElement('p');q.style.cssText='font-size:14px;margin-bottom:10px;font-weight:500;';q.textContent=data.question;wrap.appendChild(q);
-      let answered=false;
-      data.options.forEach((opt,i)=>{
-        const btn=document.createElement('button');btn.className='qcm-option';
-        const letter=document.createElement('div');letter.className='qcm-letter';letter.textContent=String.fromCharCode(65+i);btn.appendChild(letter);
-        const span=document.createElement('span');span.textContent=opt.replace(/^[A-D]\.\s*/,'');btn.appendChild(span);
-        btn.onclick=()=>{
-          if(answered)return;answered=true;
-          wrap.querySelectorAll('.qcm-option').forEach((b,j)=>{b.style.pointerEvents='none';if(j===data.correct)b.classList.add('correct');else if(j===i&&i!==data.correct)b.classList.add('wrong');});
-          const fb=document.createElement('div');fb.className=`feedback ${i===data.correct?'correct':'wrong'}`;fb.textContent=(i===data.correct?'✓ ':'✗ ')+data.explanation;wrap.appendChild(fb);
-          setTimeout(()=>setQuickReplies(['Continuer','Autre exercice']),400);
+    // ── ARTEFACTS ────────────────────────────────────────────────────────
+    function renderQCM(data) {
+      const wrap = document.createElement('div'); wrap.className = 'artifact';
+      const lbl = document.createElement('div'); lbl.className = 'artifact-label'; lbl.textContent = 'Question'; wrap.appendChild(lbl);
+      const q = document.createElement('p'); q.style.cssText = 'font-size:14px;margin-bottom:10px;font-weight:500;'; q.textContent = data.question; wrap.appendChild(q);
+      let answered = false;
+      data.options.forEach((opt, i) => {
+        const btn = document.createElement('button'); btn.className = 'qcm-option';
+        const letter = document.createElement('div'); letter.className = 'qcm-letter'; letter.textContent = String.fromCharCode(65 + i); btn.appendChild(letter);
+        const span = document.createElement('span'); span.textContent = opt.replace(/^[A-D]\.\s*/, ''); btn.appendChild(span);
+        btn.onclick = () => {
+          if (answered) return; answered = true;
+          wrap.querySelectorAll('.qcm-option').forEach((b, j) => { b.style.pointerEvents = 'none'; if (j === data.correct) b.classList.add('correct'); else if (j === i && i !== data.correct) b.classList.add('wrong'); });
+          const fb = document.createElement('div'); fb.className = `feedback ${i === data.correct ? 'correct' : 'wrong'}`; fb.textContent = (i === data.correct ? '✓ ' : '✗ ') + data.explanation; wrap.appendChild(fb);
+          setTimeout(() => setQuickReplies(['Continuer', 'Autre exercice']), 400);
         };
         wrap.appendChild(btn);
       });
-      addArtifact(wrap);document.getElementById('chatMessages').scrollTop=document.getElementById('chatMessages').scrollHeight;
+      addArtifact(wrap); document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
     }
 
-    function renderUseCase(data){
-      const wrap=document.createElement('div');wrap.className='artifact';
-      const lbl=document.createElement('div');lbl.className='artifact-label';lbl.textContent='Mise en situation';wrap.appendChild(lbl);
-      const sit=document.createElement('div');sit.className='usecase-situation';sit.innerHTML=`<strong>Contexte</strong>${data.situation}`;wrap.appendChild(sit);
-      const q=document.createElement('div');q.className='usecase-question';q.textContent=data.question;wrap.appendChild(q);
-      const textarea=document.createElement('textarea');textarea.className='usecase-input';textarea.placeholder='Votre réponse...';wrap.appendChild(textarea);
-      const hint=document.createElement('span');hint.className='usecase-hint';hint.textContent='💡 Voir un indice';
-      let hintShown=false;hint.onclick=()=>{if(!hintShown){hintShown=true;hint.textContent='💡 '+data.hint;}};wrap.appendChild(hint);
-      let submitted=false;
-      const submit=document.createElement('button');submit.className='usecase-submit';submit.textContent='Valider ma réponse';
-      submit.onclick=async()=>{
-        if(submitted||!textarea.value.trim())return;submitted=true;
-        textarea.disabled=true;submit.disabled=true;
-        const userAnswer=textarea.value.trim();
-        conversationHistory.push({role:'user',content:`Ma réponse à la mise en situation : ${userAnswer}`});
-        isTyping=true;document.getElementById('sendBtn').disabled=true;showTyping();
-        try{
-          const raw=await callBackend(conversationHistory);
-          hideTyping();conversationHistory.push({role:'assistant',content:raw});
-          const fb=document.createElement('div');fb.className='feedback correct';fb.style.marginTop='10px';
-          fb.innerHTML=typeof marked!=='undefined'?marked.parse(raw):raw;wrap.appendChild(fb);
-          setQuickReplies(['Continuer','Autre exercice']);
-        }catch(err){hideTyping();addMessage('agent','Erreur: '+err.message);}
-        isTyping=false;updateSendBtn();
+    function renderUseCase(data) {
+      const wrap = document.createElement('div'); wrap.className = 'artifact';
+      const lbl = document.createElement('div'); lbl.className = 'artifact-label'; lbl.textContent = 'Mise en situation'; wrap.appendChild(lbl);
+      const sit = document.createElement('div'); sit.className = 'usecase-situation'; sit.innerHTML = `<strong>Contexte</strong>${data.situation}`; wrap.appendChild(sit);
+      const q = document.createElement('div'); q.className = 'usecase-question'; q.textContent = data.question; wrap.appendChild(q);
+      const textarea = document.createElement('textarea'); textarea.className = 'usecase-input'; textarea.placeholder = 'Votre réponse...'; wrap.appendChild(textarea);
+      const hint = document.createElement('span'); hint.className = 'usecase-hint'; hint.textContent = '💡 Voir un indice';
+      let hintShown = false; hint.onclick = () => { if (!hintShown) { hintShown = true; hint.textContent = '💡 ' + data.hint; } }; wrap.appendChild(hint);
+      let submitted = false;
+      const submit = document.createElement('button'); submit.className = 'usecase-submit'; submit.textContent = 'Valider ma réponse';
+      submit.onclick = async () => {
+        if (submitted || !textarea.value.trim()) return; submitted = true;
+        textarea.disabled = true; submit.disabled = true;
+        conversationHistory.push({ role: 'user', content: `Ma réponse : ${textarea.value.trim()}` });
+        isTyping = true; document.getElementById('sendBtn').disabled = true; showTyping();
+        try {
+          const raw = await callBackend(conversationHistory); hideTyping();
+          conversationHistory.push({ role: 'assistant', content: raw });
+          const fb = document.createElement('div'); fb.className = 'feedback correct'; fb.style.marginTop = '10px';
+          fb.innerHTML = typeof marked !== 'undefined' ? marked.parse(raw) : raw; wrap.appendChild(fb);
+          setQuickReplies(['Continuer', 'Autre exercice']);
+        } catch(err) { hideTyping(); addMessage('agent', 'Erreur: ' + err.message); }
+        isTyping = false; updateSendBtn();
       };
       wrap.appendChild(submit);
-      addArtifact(wrap);document.getElementById('chatMessages').scrollTop=document.getElementById('chatMessages').scrollHeight;
+      addArtifact(wrap); document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
     }
 
-    function renderDragDrop(data){
-      const wrap=document.createElement('div');wrap.className='artifact';
-      const lbl=document.createElement('div');lbl.className='artifact-label';lbl.textContent='Correspondances';wrap.appendChild(lbl);
-      const instr=document.createElement('div');instr.className='dragdrop-instruction';instr.textContent=data.instruction;wrap.appendChild(instr);
-      const area=document.createElement('div');area.className='dragdrop-area';
-      const itemsCol=document.createElement('div');itemsCol.className='dragdrop-items';
-      const targetsCol=document.createElement('div');targetsCol.className='dragdrop-targets';
-      const placements={};
-      data.items.forEach(item=>{
-        const el=document.createElement('div');el.className='drag-item';el.textContent=item;el.draggable=true;el.dataset.item=item;
-        el.addEventListener('dragstart',()=>{draggedItem=item;el.classList.add('dragging');});
-        el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+    function renderDragDrop(data) {
+      const wrap = document.createElement('div'); wrap.className = 'artifact';
+      const lbl = document.createElement('div'); lbl.className = 'artifact-label'; lbl.textContent = 'Correspondances'; wrap.appendChild(lbl);
+      const instr = document.createElement('div'); instr.className = 'dragdrop-instruction'; instr.textContent = data.instruction; wrap.appendChild(instr);
+      const area = document.createElement('div'); area.className = 'dragdrop-area';
+      const itemsCol = document.createElement('div'); itemsCol.className = 'dragdrop-items';
+      const targetsCol = document.createElement('div'); targetsCol.className = 'dragdrop-targets';
+      data.items.forEach(item => {
+        const el = document.createElement('div'); el.className = 'drag-item'; el.textContent = item; el.draggable = true; el.dataset.item = item;
+        el.addEventListener('dragstart', () => { draggedItem = item; el.classList.add('dragging'); });
+        el.addEventListener('dragend', () => el.classList.remove('dragging'));
         itemsCol.appendChild(el);
       });
-      data.targets.forEach(target=>{
-        const el=document.createElement('div');el.className='drop-target';el.dataset.target=target;
-        const lbl2=document.createElement('span');lbl2.className='drop-target-label';lbl2.textContent=target;el.appendChild(lbl2);
-        el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over');});
-        el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
-        el.addEventListener('drop',e=>{
-          e.preventDefault();el.classList.remove('drag-over');if(!draggedItem)return;
-          placements[draggedItem]=target;
-          const existing=el.querySelector('.drag-item.placed');if(existing)existing.remove();
-          const placed=document.createElement('div');placed.className='drag-item placed';placed.textContent=draggedItem;el.appendChild(placed);
-          document.querySelectorAll('.drag-item:not(.placed)').forEach(d=>{if(d.dataset.item===draggedItem)d.style.visibility='hidden';});
-          draggedItem=null;
+      data.targets.forEach(target => {
+        const el = document.createElement('div'); el.className = 'drop-target'; el.dataset.target = target;
+        const lbl2 = document.createElement('span'); lbl2.className = 'drop-target-label'; lbl2.textContent = target; el.appendChild(lbl2);
+        el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+        el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+        el.addEventListener('drop', e => {
+          e.preventDefault(); el.classList.remove('drag-over'); if (!draggedItem) return;
+          const existing = el.querySelector('.drag-item.placed'); if (existing) existing.remove();
+          const placed = document.createElement('div'); placed.className = 'drag-item placed'; placed.textContent = draggedItem; el.appendChild(placed);
+          document.querySelectorAll('.drag-item:not(.placed)').forEach(d => { if (d.dataset.item === draggedItem) d.style.visibility = 'hidden'; });
+          draggedItem = null;
         });
         targetsCol.appendChild(el);
       });
-      area.appendChild(itemsCol);area.appendChild(targetsCol);wrap.appendChild(area);
-      let validated=false;
-      const validateBtn=document.createElement('button');validateBtn.className='dragdrop-validate';validateBtn.textContent='Vérifier';
-      validateBtn.onclick=()=>{
-        if(validated)return;validated=true;let allCorrect=true;
-        data.targets.forEach(target=>{
-          const targetEl=targetsCol.querySelector(`[data-target="${CSS.escape(target)}"]`);
-          const placedEl=targetEl?targetEl.querySelector('.drag-item.placed'):null;
-          const placedItem=placedEl?placedEl.textContent:'';
-          const isCorrect=data.solution[placedItem]===target;
-          if(!isCorrect)allCorrect=false;
-          if(targetEl)targetEl.classList.add(isCorrect?'correct':'wrong');
-          if(placedEl)placedEl.className='drag-item '+(isCorrect?'placed':'wrong-placed');
+      area.appendChild(itemsCol); area.appendChild(targetsCol); wrap.appendChild(area);
+      let validated = false;
+      const validateBtn = document.createElement('button'); validateBtn.className = 'dragdrop-validate'; validateBtn.textContent = 'Vérifier';
+      validateBtn.onclick = () => {
+        if (validated) return; validated = true; let allCorrect = true;
+        data.targets.forEach(target => {
+          const targetEl = targetsCol.querySelector(`[data-target="${CSS.escape(target)}"]`);
+          const placedEl = targetEl ? targetEl.querySelector('.drag-item.placed') : null;
+          const isCorrect = placedEl && data.solution[placedEl.textContent] === target;
+          if (!isCorrect) allCorrect = false;
+          if (targetEl) targetEl.classList.add(isCorrect ? 'correct' : 'wrong');
+          if (placedEl) placedEl.className = 'drag-item ' + (isCorrect ? 'placed' : 'wrong-placed');
         });
-        const fb=document.createElement('div');fb.className=`feedback ${allCorrect?'correct':'wrong'}`;
-        fb.textContent=(allCorrect?'✓ Parfait ! ':'✗ Pas tout à fait. ')+data.explanation;wrap.appendChild(fb);
-        setTimeout(()=>setQuickReplies(['Continuer','Réessayer']),400);
+        const fb = document.createElement('div'); fb.className = `feedback ${allCorrect ? 'correct' : 'wrong'}`;
+        fb.textContent = (allCorrect ? '✓ Parfait ! ' : '✗ Pas tout à fait. ') + data.explanation; wrap.appendChild(fb);
+        setTimeout(() => setQuickReplies(['Continuer', 'Réessayer']), 400);
       };
       wrap.appendChild(validateBtn);
-      addArtifact(wrap);document.getElementById('chatMessages').scrollTop=document.getElementById('chatMessages').scrollHeight;
+      addArtifact(wrap); document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
     }
 
-    function renderScale(data){
-      const wrap=document.createElement('div');wrap.className='artifact';
-      const lbl=document.createElement('div');lbl.className='artifact-label';lbl.textContent='Estimation';wrap.appendChild(lbl);
-      const q=document.createElement('div');q.className='scale-question';q.textContent=data.question;wrap.appendChild(q);
-      const labels=document.createElement('div');labels.className='scale-labels';labels.innerHTML=`<span>${data.min_label}</span><span>${data.max_label}</span>`;wrap.appendChild(labels);
-      const btns=document.createElement('div');btns.className='scale-buttons';
-      let answered=false;
-      for(let i=data.min;i<=data.max;i++){
-        const btn=document.createElement('button');btn.className='scale-btn';btn.textContent=i;
-        const val=i;
-        btn.onclick=()=>{
-          if(answered)return;answered=true;
-          btn.classList.add('selected');
-          setTimeout(()=>{
-            btns.querySelectorAll('.scale-btn').forEach(b=>{b.style.pointerEvents='none';if(parseInt(b.textContent)===data.correct)b.classList.add('correct');else if(b===btn&&val!==data.correct)b.classList.add('wrong');});
-            const fb=document.createElement('div');fb.className=`feedback ${val===data.correct?'correct':'wrong'}`;fb.textContent=(val===data.correct?'✓ ':'✗ ')+data.explanation;wrap.appendChild(fb);
-            setTimeout(()=>setQuickReplies(['Continuer','Autre exercice']),400);
-          },300);
+    function renderScale(data) {
+      const wrap = document.createElement('div'); wrap.className = 'artifact';
+      const lbl = document.createElement('div'); lbl.className = 'artifact-label'; lbl.textContent = 'Estimation'; wrap.appendChild(lbl);
+      const q = document.createElement('div'); q.className = 'scale-question'; q.textContent = data.question; wrap.appendChild(q);
+      const labels = document.createElement('div'); labels.className = 'scale-labels'; labels.innerHTML = `<span>${data.min_label}</span><span>${data.max_label}</span>`; wrap.appendChild(labels);
+      const btns = document.createElement('div'); btns.className = 'scale-buttons';
+      let answered = false;
+      for (let i = data.min; i <= data.max; i++) {
+        const btn = document.createElement('button'); btn.className = 'scale-btn'; btn.textContent = i;
+        const val = i;
+        btn.onclick = () => {
+          if (answered) return; answered = true; btn.classList.add('selected');
+          setTimeout(() => {
+            btns.querySelectorAll('.scale-btn').forEach(b => { b.style.pointerEvents = 'none'; if (parseInt(b.textContent) === data.correct) b.classList.add('correct'); else if (b === btn && val !== data.correct) b.classList.add('wrong'); });
+            const fb = document.createElement('div'); fb.className = `feedback ${val === data.correct ? 'correct' : 'wrong'}`; fb.textContent = (val === data.correct ? '✓ ' : '✗ ') + data.explanation; wrap.appendChild(fb);
+            setTimeout(() => setQuickReplies(['Continuer', 'Autre exercice']), 400);
+          }, 300);
         };
         btns.appendChild(btn);
       }
       wrap.appendChild(btns);
-      addArtifact(wrap);document.getElementById('chatMessages').scrollTop=document.getElementById('chatMessages').scrollHeight;
+      addArtifact(wrap); document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
     }
 
-    function updateProgress(){
-      const theme=THEMES[currentTheme];
-      const done=theme.nodes.filter(n=>nodeStates[n.id]==='done').length;
-      const partial=theme.nodes.filter(n=>nodeStates[n.id]==='partial').length;
-      const pct=Math.round(((done+partial*0.5)/theme.nodes.length)*100);
-      const fill=document.getElementById(`prog-${currentTheme}`);const lbl=document.getElementById(`prog-${currentTheme}-lbl`);
-      if(fill)fill.style.width=pct+'%';if(lbl)lbl.textContent=pct+' %';
+    function updateProgress() {
+      const theme = DOMAINS[currentDomain].themes[currentThemeKey];
+      const done = theme.nodes.filter(n => nodeStates[n] === 'done').length;
+      const partial = theme.nodes.filter(n => nodeStates[n] === 'partial').length;
+      const pct = Math.round(((done + partial * 0.5) / theme.nodes.length) * 100);
+      const fill = document.getElementById(`prog-${currentDomain}-${currentThemeKey}`);
+      const lbl = document.getElementById(`prog-lbl-${currentDomain}-${currentThemeKey}`);
+      if (fill) fill.style.width = pct + '%';
+      if (lbl) lbl.textContent = pct + ' %';
     }
 
-    function showMapBanner(){
-      const msgs=document.getElementById('chatMessages');
-      const banner=document.createElement('div');banner.className='map-update-banner';
-      banner.innerHTML='<i class="ti ti-map"></i> <span>Carte mise à jour !</span>';
-      banner.onclick=()=>banner.remove();msgs.appendChild(banner);msgs.scrollTop=msgs.scrollHeight;
+    function showMapBanner() {
+      const msgs = document.getElementById('chatMessages');
+      const banner = document.createElement('div'); banner.className = 'map-update-banner';
+      banner.innerHTML = '<i class="ti ti-map"></i> <span>Carte mise à jour !</span>';
+      banner.onclick = () => banner.remove(); msgs.appendChild(banner); msgs.scrollTop = msgs.scrollHeight;
     }
   </script>
 </body>

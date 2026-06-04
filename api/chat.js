@@ -16,8 +16,8 @@ Ton ton est direct, chaleureux, encourageant. Tes messages sont courts (3 phrase
 Au démarrage d'un thème, AVANT tout enseignement, tu évalues le niveau de l'apprenant.
 
 Règles :
-- Tu poses entre 3 et 5 questions par sous-thème, en utilisant des artefacts variés.
-- Tu NE corriges PAS pendant l'évaluation — tu enregistres mentalement les résultats.
+- Tu poses entre 3 et 5 questions, en utilisant des artefacts variés.
+- Tu NE corriges PAS pendant l'évaluation.
 - Tu annonces clairement le début : "Avant de commencer, je vais évaluer votre niveau — X questions."
 - À la fin, tu émets un bilan pour chaque concept : "none", "partial", ou "done".
 - Tu mets à jour la carte avec ce JSON EXACT (rien d'autre) :
@@ -27,8 +27,6 @@ Règles :
 ---
 
 ## PHASE 2 — ENSEIGNEMENT
-
-Tu enseignes concept par concept, du plus bas niveau non maîtrisé vers le plus avancé.
 
 ### Choix des artefacts — dans cet ordre de priorité
 
@@ -46,31 +44,28 @@ Tu enseignes concept par concept, du plus bas niveau non maîtrisé vers le plus
 
 IMPORTANT : les artefacts sont toujours du JSON pur, sans texte avant ni après.
 
-### Utilisation des idées reçues
-Les idées reçues de la base de connaissances sont ta source principale pour les questions de challenge.
-
-### Indicateurs de maîtrise
-Un concept est validé UNIQUEMENT quand tous ses indicateurs de maîtrise sont atteints.
-{"type":"map_update","message":"Bien joué ! [Concept] maîtrisé.","acquired":"concept_id"}
-
 ### Gestion des erreurs
 - Première erreur : reformule différemment. Ne dis pas "faux".
 - Deuxième erreur : reviens sur le prérequis. Annonce-le clairement.
+
+### Validation
+Un concept est validé quand tous ses indicateurs de maîtrise sont atteints.
+{"type":"map_update","message":"Bien joué ! [Concept] maîtrisé.","acquired":"concept_id"}
 
 ---
 
 ## PHASE 3 — SUIVI DE PROGRESSION
 
-Tous les 10 échanges environ, fais un point et mets à jour la carte :
+Tous les 10 échanges environ :
 {"type":"map_update","message":"Point de progression.","levels":{"concept_id":"none|partial|done"}}
 
 ---
 
 ## RÈGLES GÉNÉRALES
-
 - Tu utilises UNIQUEMENT le contenu de la base de connaissances fournie.
 - Tes messages texte sont en markdown court (max 3 phrases).
 - Tu t'adaptes à n'importe quel domaine.
+- Tu utilises les idées reçues de la KB pour construire des questions de challenge.
 
 ---
 
@@ -79,38 +74,26 @@ Tous les 10 échanges environ, fais un point et mets à jour la carte :
 {{KB}}
 `;
 
-// Charge la KB depuis les fichiers du projet
 function loadKB(domain, theme) {
-  const filename = `kb_${domain}_${theme}.md`.toLowerCase().replace(/[^a-z0-9_.]/g, '_');
+  const filename = `kb_${theme}.md`;
   const filepath = path.join(process.cwd(), filename);
   try {
     return fs.readFileSync(filepath, 'utf8');
   } catch(e) {
-    // Fallback sur le fichier concepts_theories par défaut
     try {
       return fs.readFileSync(path.join(process.cwd(), 'kb_concepts_theories.md'), 'utf8');
     } catch(e2) {
-      return 'Base de connaissances non trouvée.';
+      return `Base de connaissances non trouvée pour : ${domain}/${theme}`;
     }
   }
 }
 
 function mistralRequest(messages) {
   return new Promise((resolve, reject) => {
-    const data = JSON.stringify({
-      model: 'mistral-small-latest',
-      max_tokens: 1000,
-      messages
-    });
+    const data = JSON.stringify({ model: 'mistral-small-latest', max_tokens: 1000, messages });
     const options = {
-      hostname: 'api.mistral.ai',
-      path: '/v1/chat/completions',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`,
-        'Content-Length': Buffer.byteLength(data)
-      }
+      hostname: 'api.mistral.ai', path: '/v1/chat/completions', method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}`, 'Content-Length': Buffer.byteLength(data) }
     };
     const req = https.request(options, res => {
       let result = '';
@@ -120,36 +103,27 @@ function mistralRequest(messages) {
           const parsed = JSON.parse(result);
           if (!parsed.choices?.[0]?.message) return reject(new Error('Unexpected response: ' + result.substring(0, 200)));
           resolve(parsed.choices[0].message.content);
-        } catch(e) {
-          reject(new Error('Parse error: ' + result.substring(0, 200)));
-        }
+        } catch(e) { reject(new Error('Parse error: ' + result.substring(0, 200))); }
       });
     });
     req.on('error', reject);
-    req.write(data);
-    req.end();
+    req.write(data); req.end();
   });
 }
 
 module.exports = async function handler(req, res) {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') { res.status(204).end(); return; }
   if (req.method !== 'POST') { res.status(404).json({ error: 'Not found' }); return; }
 
   const { domain, theme, messages } = req.body;
   if (!messages) { res.status(400).json({ error: 'Missing messages' }); return; }
 
-  const kb = loadKB(domain || 'concepts', theme || 'theories');
+  const kb = loadKB(domain || 'onboarding', theme || 'onboarding_sigys');
   const systemPrompt = SYSTEM_PROMPT.replace('{{KB}}', kb);
-
-  const fullMessages = [
-    { role: 'system', content: systemPrompt },
-    ...messages
-  ];
+  const fullMessages = [{ role: 'system', content: systemPrompt }, ...messages];
 
   try {
     const text = await mistralRequest(fullMessages);
