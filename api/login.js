@@ -1,4 +1,7 @@
-const USERS = require('../users');
+const USERS = [
+  { login: 'adminclar', password: 'clartee2026', prenom: 'Admin' },
+  { login: 'democlar2026', password: 'demo2026tee', prenom: 'Testeur' },
+];
 
 module.exports = function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
