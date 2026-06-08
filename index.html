@@ -86,8 +86,8 @@
     .dc-badge{font-size:9.5px;padding:2px 7px;border-radius:20px;font-weight:500;}
     .dc-badge.g{background:var(--foret-light);color:var(--foret);}
     .dc-badge.t{background:var(--terra-light);color:var(--terra);}
-    .tags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:.5rem;}
-    .tag{font-size:9.5px;padding:1px 6px;border-radius:20px;border:1px solid var(--border);color:var(--ink-mid);}
+    .tags{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:.5rem;}
+    .tag{font-size:9.5px;padding:1px 6px;border-radius:20px;border:1px solid var(--border);color:var(--ink-mid);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .prog-row{display:flex;align-items:center;gap:6px;}
     .prog-bar{flex:1;height:3px;background:var(--cream-dark);border-radius:3px;overflow:hidden;}
     .prog-fill{height:100%;border-radius:3px;}
@@ -304,8 +304,8 @@
       <div class="page" id="page-formation">
         <div class="page-title">Se former</div>
         <div class="sec-label">Parcours affectés</div>
-        <div class="parcours-item"><div class="parcours-ico"><i class="ti ti-route" aria-hidden="true"></i></div><span class="parcours-name">Onboarding atelier — Nouveau collaborateur</span><span class="parcours-prog">3 / 8 étapes</span></div>
-        <div class="parcours-item"><div class="parcours-ico"><i class="ti ti-shield-check" aria-hidden="true"></i></div><span class="parcours-name">Sécurité machines</span><span class="parcours-prog">0 / 5 étapes</span></div>
+        <div class="parcours-item" onclick="openTheme('onboarding','sigys')"><div class="parcours-ico"><i class="ti ti-route" aria-hidden="true"></i></div><span class="parcours-name">Onboarding atelier — Nouveau collaborateur</span><span class="parcours-prog">3 / 8 étapes</span></div>
+        <div class="parcours-item" onclick="openTheme('ops','machines')"><div class="parcours-ico"><i class="ti ti-shield-check" aria-hidden="true"></i></div><span class="parcours-name">Sécurité machines</span><span class="parcours-prog">0 / 5 étapes</span></div>
         <div class="sec-label" style="margin-top:.9rem;">Tous les thèmes</div>
         <div class="theme-item" onclick="openTheme('onboarding','sigys')"><div class="theme-ico"><i class="ti ti-door-enter" aria-hidden="true"></i></div><div class="theme-info"><div class="theme-name">L'entreprise SIGYS</div><div class="theme-domain">Onboarding</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill g" style="width:40%"></div></div><span class="prog-pct">40%</span></div></div>
         <div class="theme-item" onclick="openTheme('onboarding','regles')"><div class="theme-ico"><i class="ti ti-tools" aria-hidden="true"></i></div><div class="theme-info"><div class="theme-name">Règles & outils</div><div class="theme-domain">Onboarding</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill g" style="width:20%"></div></div><span class="prog-pct">20%</span></div></div>
@@ -683,10 +683,8 @@ async function sendPartagerMsg(){
   const tdots=document.createElement('div');tdots.className='typing-dots';tdots.innerHTML='<span></span><span></span><span></span>';
   typingDiv.appendChild(tav);typingDiv.appendChild(tdots);msgs.appendChild(typingDiv);msgs.scrollTop=msgs.scrollHeight;
 
-  const partagerSystem=`Tu es Clartée, agent de capture de connaissance pour SIGYS. Tu aides un employé à partager et structurer une connaissance ou un retour d'expérience. Tu poses des questions pour structurer ce qu'il sait : contexte, observation, impact, fréquence, public concerné. Tu es bienveillant et efficace. Max 2 phrases par réponse.`;
-
   try{
-    const res=await fetch(BACKEND_CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:partagerSystem,messages:partagerHistory})});
+    const res=await fetch(BACKEND_CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'partager',messages:partagerHistory})});
     const data=await res.json();
     const t=document.getElementById('partagerTyping');if(t)t.remove();
     const raw=data.content[0].text.trim();
