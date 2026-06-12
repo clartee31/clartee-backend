@@ -313,6 +313,31 @@
     .pv-edit{width:24px;height:24px;border-radius:6px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;}
     .pv-edit i{font-size:13px;color:var(--ink-light);}
     .pv-edit:hover i{color:var(--terra);}
+
+    /* HAMBURGER */
+    .hamburger{display:none;width:36px;height:36px;border-radius:8px;border:none;background:var(--cream);cursor:pointer;align-items:center;justify-content:center;flex-shrink:0;}
+    .hamburger i{font-size:20px;color:var(--foret);}
+
+    /* OVERLAY mobile */
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(28,25,22,.45);z-index:49;-webkit-tap-highlight-color:transparent;}
+    .sidebar-overlay.open{display:block;}
+
+    /* MOBILE */
+    @media(max-width:700px){
+      .hamburger{display:flex;}
+      .top-name{display:none;}
+      .sidebar{
+        position:fixed;top:0;left:0;height:100%;z-index:50;
+        transform:translateX(-100%);transition:transform .25s ease;
+        width:220px;
+      }
+      .sidebar.open{transform:translateX(0);}
+      .main{width:100%;}
+      .domains-grid{grid-template-columns:1fr;}
+      .suivi-grid{grid-template-columns:1fr;}
+      .chat-win{height:calc(100vh - 160px);}
+      .content{padding:.875rem;}
+    }
   </style>
 </head>
 <body>
@@ -331,8 +356,10 @@
   </div>
 </div>
 
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <div class="app" id="appWrap" style="display:none;">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <div class="logo-text">Clart<em>é</em>e</div>
       <div class="logo-client">for SIGYS</div>
@@ -350,6 +377,7 @@
 
   <main class="main">
     <div class="topbar">
+      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></button>
       <div class="search-wrap">
         <i class="ti ti-search"></i>
         <input type="text" placeholder="Rechercher ou poser une question...">
@@ -509,6 +537,18 @@
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
+function toggleSidebar(){
+  const s=document.getElementById('sidebar');
+  const o=document.getElementById('sidebarOverlay');
+  const open=s.classList.toggle('open');
+  o.classList.toggle('open',open);
+}
+
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
 const BACKEND_LOGIN='/api/login';
 const BACKEND_CHAT='/api/chat';
 
@@ -563,6 +603,7 @@ function goPage(id){
   const labels={accueil:'Accueil',formation:'Se former',partager:'Partager',validation:'File de validation',base:'Base de connaissances',parcours:'Parcours',apprenants:'Suivi des apprenants'};
   document.querySelectorAll('.nav-item').forEach(n=>{if(n.textContent.trim()===labels[id])n.classList.add('active');});
   currentPage=id;
+  closeSidebar();
 }
 
 function switchRole(role){
