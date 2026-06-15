@@ -5,8 +5,22 @@ const path = require('path');
 const API_KEY = process.env.MISTRAL_API_KEY;
 
 const SYSTEM_PROMPT_FORMATION = `
-Tu es Clartée, agent pédagogique IA pour SIGYS. Tu transmets des connaissances de manière engageante et efficace.
+Tu es Clartée, agent pédagogique IA. Tu transmets des connaissances de manière engageante et efficace.
 Tes messages texte sont courts — 2 phrases max. Tu n'utilises JAMAIS de texte brut pour poser une question : toujours un artefact JSON.
+
+---
+
+## SCRIPT PÉDAGOGIQUE — PRIORITÉ ABSOLUE
+
+Si un SCRIPT PÉDAGOGIQUE est fourni plus bas (section "SCRIPT PÉDAGOGIQUE DU MODULE"), il PRIME sur les phases génériques ci-dessous :
+- Tu suis les SÉQUENCES et ÉTAPES du script dans l'ordre exact.
+- Tu utilises le TYPE d'artefact indiqué à chaque étape, avec le contenu indiqué.
+- Tu respectes les branchements (→ si correct, si erreur, si "Expliquer différemment").
+- Tu peux reformuler le wording pour la fluidité, mais jamais changer la séquence, les chiffres ou les types d'artefacts.
+- Le mode "Évaluer mon niveau" reste disponible : dans ce cas, construis 3-5 questions à partir des notions du script, puis démarre le script à la séquence la plus faible.
+- Le mode "Commencer directement" = démarrer le script à la SÉQUENCE 0 ou 1.
+
+Si AUCUN script n'est fourni, applique les phases génériques ci-dessous.
 
 ---
 
@@ -88,6 +102,8 @@ Note: maximum 2 chiffres. color = "green" ou "red".
 - Tu utilises UNIQUEMENT le contenu de la base de connaissances fournie.
 - Les idées reçues de la KB sont excellentes pour les questions de challenge.
 
+{{SCRIPT}}
+
 ---
 
 ## BASE DE CONNAISSANCES
@@ -121,6 +137,17 @@ function loadKB(domain, theme) {
   catch(e) {
     try { return fs.readFileSync(path.join(process.cwd(), 'kb_concepts_theories.md'), 'utf8'); }
     catch(e2) { return `Base de connaissances non trouvée pour : ${domain}/${theme}`; }
+  }
+}
+
+function loadScript(theme) {
+  // Script pédagogique optionnel : script_{theme}.md à la racine
+  const filepath = path.join(process.cwd(), `script_${theme}.md`);
+  try {
+    const content = fs.readFileSync(filepath, 'utf8');
+    return `\n---\n\n## SCRIPT PÉDAGOGIQUE DU MODULE\n\n${content}\n`;
+  } catch(e) {
+    return ''; // pas de script : phases génériques
   }
 }
 
@@ -162,7 +189,8 @@ module.exports = async function handler(req, res) {
     systemPrompt = SYSTEM_PROMPT_PARTAGER;
   } else {
     const kb = loadKB(domain || 'onboarding', theme || 'onboarding_sigys');
-    systemPrompt = SYSTEM_PROMPT_FORMATION.replace('{{KB}}', kb);
+    const script = loadScript(theme || '');
+    systemPrompt = SYSTEM_PROMPT_FORMATION.replace('{{KB}}', kb).replace('{{SCRIPT}}', script);
   }
 
   const fullMessages = [{ role: 'system', content: systemPrompt }, ...messages];

@@ -411,6 +411,7 @@
       <div class="page" id="page-formation">
         <div class="page-title">Se former</div>
         <div class="sec-label">Parcours affectés</div>
+        <div class="parcours-item" onclick="openTheme('green','green_eau')"><div class="parcours-ico" style="background:#2D6B3A;"><i class="ti ti-leaf"></i></div><span class="parcours-name">Green Déclic — Crise de l'eau</span><span class="parcours-prog">Nouveau</span></div>
         <div class="parcours-item" onclick="openTheme('onboarding','sigys')"><div class="parcours-ico"><i class="ti ti-route"></i></div><span class="parcours-name">Onboarding atelier — Nouveau collaborateur</span><span class="parcours-prog">3 / 8 étapes</span></div>
         <div class="parcours-item" onclick="openTheme('ops','machines')"><div class="parcours-ico"><i class="ti ti-shield-check"></i></div><span class="parcours-name">Sécurité machines</span><span class="parcours-prog">0 / 5 étapes</span></div>
         <div class="sec-label" style="margin-top:.9rem;">Tous les thèmes</div>
@@ -618,7 +619,7 @@ function switchRole(role){
 function openTheme(domain,theme){
   currentDomain=domain;currentTheme=theme;
   agentHistory=[];
-  const labels={sigys:"L'entreprise SIGYS",regles:"Règles & outils",qualite:"Culture qualité",materiaux:"Matériaux",machines:"Machines & outils",fabrication:"Fabrication"};
+  const labels={sigys:"L'entreprise SIGYS",regles:"Règles & outils",qualite:"Culture qualité",materiaux:"Matériaux",machines:"Machines & outils",fabrication:"Fabrication",green_eau:"Green Déclic — Crise de l'eau"};
   document.getElementById('agentThemeTitle').textContent=labels[theme]||theme;
   document.getElementById('agentMsgs').innerHTML='';
   document.getElementById('agentQR').innerHTML='';
