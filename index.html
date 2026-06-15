@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clartée — SIGYS</title>
+  <title>Clartée · SIGYS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Caladea:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -219,8 +219,8 @@
     .dd-area{display:flex;gap:12px;margin-bottom:9px;}
     .dd-items{display:flex;flex-direction:column;gap:5px;flex:1;}
     .dd-targets{display:flex;flex-direction:column;gap:5px;flex:1;}
-    .dd-item{padding:7px 10px;background:var(--foret-light);border:1px solid var(--foret);border-radius:8px;font-size:12px;cursor:grab;user-select:none;color:var(--foret);transition:all .15s;}
-    .dd-item:hover{background:var(--foret);color:white;}
+    .dd-item{padding:7px 10px;background:var(--cream-dark);border:1px solid var(--ink-light);border-radius:8px;font-size:12px;cursor:grab;user-select:none;color:var(--ink-mid);transition:all .15s;}
+    .dd-item:hover{background:var(--cream);border-color:var(--ink-mid);}
     .dd-target{padding:7px 10px;border:2px dashed var(--border);border-radius:8px;font-size:12px;min-height:36px;transition:all .15s;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
     .dd-target.over{border-color:var(--foret);background:var(--foret-light);}
     .dd-validate{padding:8px 18px;border-radius:30px;background:var(--terra);color:white;border:none;font-size:13px;font-family:var(--font-body);cursor:pointer;transition:background .15s;}
@@ -352,7 +352,7 @@
     <input class="login-input" id="lp" type="password" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" id="loginBtn" onclick="doLogin()">Se connecter</button>
     <div class="login-error" id="loginError"></div>
-    <div class="login-footer">Accès réservé — Clartée © 2026</div>
+    <div class="login-footer">Accès réservé · Clartée © 2026</div>
   </div>
 </div>
 
@@ -411,8 +411,8 @@
       <div class="page" id="page-formation">
         <div class="page-title">Se former</div>
         <div class="sec-label">Parcours affectés</div>
-        <div class="parcours-item" onclick="openTheme('green','green_eau')"><div class="parcours-ico" style="background:#2D6B3A;"><i class="ti ti-leaf"></i></div><span class="parcours-name">Green Déclic — Crise de l'eau</span><span class="parcours-prog">Nouveau</span></div>
-        <div class="parcours-item" onclick="openTheme('onboarding','sigys')"><div class="parcours-ico"><i class="ti ti-route"></i></div><span class="parcours-name">Onboarding atelier — Nouveau collaborateur</span><span class="parcours-prog">3 / 8 étapes</span></div>
+        <div class="parcours-item" onclick="openTheme('green','green_eau')"><div class="parcours-ico" style="background:#2D6B3A;"><i class="ti ti-leaf"></i></div><span class="parcours-name">Green Déclic : Crise de l'eau</span><span class="parcours-prog">Nouveau</span></div>
+        <div class="parcours-item" onclick="openTheme('onboarding','sigys')"><div class="parcours-ico"><i class="ti ti-route"></i></div><span class="parcours-name">Onboarding atelier : nouveau collaborateur</span><span class="parcours-prog">3 / 8 étapes</span></div>
         <div class="parcours-item" onclick="openTheme('ops','machines')"><div class="parcours-ico"><i class="ti ti-shield-check"></i></div><span class="parcours-name">Sécurité machines</span><span class="parcours-prog">0 / 5 étapes</span></div>
         <div class="sec-label" style="margin-top:.9rem;">Tous les thèmes</div>
         <div class="theme-item" onclick="openTheme('onboarding','sigys')"><div class="theme-ico"><i class="ti ti-door-enter"></i></div><div class="theme-info"><div class="theme-name">L'entreprise SIGYS</div><div class="theme-domain">Onboarding</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill g" style="width:40%"></div></div><span class="prog-pct">40%</span></div></div>
@@ -497,7 +497,7 @@
           <div class="kb-domain-card" onclick="showKbDomain(this,'securite')"><i class="ti ti-shield"></i><div class="kb-domain-name">Sécurité</div><div class="kb-domain-count">6 connaissances</div></div>
           <div class="kb-domain-card" onclick="showKbDomain(this,'qualite')"><i class="ti ti-award"></i><div class="kb-domain-name">Qualité</div><div class="kb-domain-count">9 connaissances</div></div>
         </div>
-        <div class="sec-label" id="kbSubLabel">Sous-domaines — Process</div>
+        <div class="sec-label" id="kbSubLabel">Sous-domaines : Process</div>
         <div id="kbSublist"></div>
       </div>
 
@@ -619,7 +619,7 @@ function switchRole(role){
 function openTheme(domain,theme){
   currentDomain=domain;currentTheme=theme;
   agentHistory=[];
-  const labels={sigys:"L'entreprise SIGYS",regles:"Règles & outils",qualite:"Culture qualité",materiaux:"Matériaux",machines:"Machines & outils",fabrication:"Fabrication",green_eau:"Green Déclic — Crise de l'eau"};
+  const labels={sigys:"L'entreprise SIGYS",regles:"Règles & outils",qualite:"Culture qualité",materiaux:"Matériaux",machines:"Machines & outils",fabrication:"Fabrication",green_eau:"Green Déclic : Crise de l'eau"};
   document.getElementById('agentThemeTitle').textContent=labels[theme]||theme;
   document.getElementById('agentMsgs').innerHTML='';
   document.getElementById('agentQR').innerHTML='';
@@ -679,14 +679,24 @@ async function sendAgent(){
   agentTyping=false;updateAgentSend();
 }
 
-function handleResponse(raw){
-  // Essayer de parser du JSON
-  let parsed=null;
-  const match=raw.match(/^\s*(\{[\s\S]*\})\s*$/);
-  if(match){try{parsed=JSON.parse(match[1]);}catch(e){}}
+// Relance automatique de l'agent SANS afficher de message utilisateur (enchaînement de script)
+async function sendAgentSilent(signal){
+  if(agentTyping)return;
+  document.getElementById('agentQR').innerHTML='';
+  agentTyping=true;document.getElementById('agentSend').disabled=true;
+  agentHistory.push({role:'user',content:signal});
+  showTyping();
+  try{
+    const res=await fetch(BACKEND_CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domain:currentDomain,theme:currentTheme,messages:agentHistory})});
+    const data=await res.json();hideTyping();
+    const raw=data.content[0].text.trim();
+    agentHistory.push({role:'assistant',content:raw});
+    handleResponse(raw);
+  }catch(err){hideTyping();addMsg('agent','Erreur : '+err.message);}
+  agentTyping=false;updateAgentSend();
+}
 
-  if(!parsed){addMsg('agent',raw);return;}
-
+function renderParsed(parsed,raw){
   switch(parsed.type){
     case 'definition': renderDefinition(parsed); break;
     case 'knowledge_card': renderKnowledgeCard(parsed); break;
@@ -697,11 +707,52 @@ function handleResponse(raw){
     case 'dragdrop': renderDragDrop(parsed); break;
     case 'scale': renderScale(parsed); break;
     case 'map_update':
-      // Afficher le message texte uniquement, pas le JSON brut
       if(parsed.message)addMsg('agent',parsed.message);
       break;
-    default: addMsg('agent',raw);
+    default: if(raw)addMsg('agent',raw);
   }
+}
+
+function handleResponse(raw){
+  // Cas 1 : le message entier est un JSON pur
+  const whole=raw.match(/^\s*(\{[\s\S]*\})\s*$/);
+  if(whole){
+    try{ renderParsed(JSON.parse(whole[1]),raw); return; }catch(e){}
+  }
+
+  // Cas 2 : texte + un ou plusieurs blocs JSON mélangés.
+  // On extrait chaque objet JSON équilibré, on affiche le texte intercalé comme message.
+  let i=0, lastEnd=0, found=false;
+  while(i<raw.length){
+    if(raw[i]==='{'){
+      // chercher l'accolade fermante équilibrée
+      let depth=0,j=i,inStr=false,esc=false;
+      for(;j<raw.length;j++){
+        const c=raw[j];
+        if(inStr){ if(esc)esc=false; else if(c==='\\')esc=true; else if(c==='"')inStr=false; }
+        else { if(c==='"')inStr=true; else if(c==='{')depth++; else if(c==='}'){depth--; if(depth===0){j++;break;}} }
+      }
+      const candidate=raw.slice(i,j);
+      let obj=null;
+      try{ obj=JSON.parse(candidate); }catch(e){}
+      if(obj&&obj.type){
+        // texte avant le bloc
+        const before=raw.slice(lastEnd,i).trim();
+        if(before)addMsg('agent',before);
+        renderParsed(obj,null);
+        found=true; lastEnd=j; i=j; continue;
+      }
+    }
+    i++;
+  }
+  if(found){
+    const after=raw.slice(lastEnd).trim();
+    if(after)addMsg('agent',after);
+    return;
+  }
+
+  // Cas 3 : pas de JSON exploitable, afficher tel quel
+  addMsg('agent',raw);
 }
 
 // ── ARTEFACTS TRANSMISSION ────────────────────────────────────────
@@ -767,6 +818,18 @@ function renderKnowledgeCard(d){
   svgContent+=`</svg>`;
   const svgWrap=document.createElement('div');svgWrap.innerHTML=svgContent;card.appendChild(svgWrap);
 
+  // Liste textuelle explicite des notions (lisible, accessible, mobile-friendly)
+  const list=document.createElement('div');
+  list.style.cssText='padding:0 1rem .5rem;display:flex;flex-direction:column;gap:.4rem;';
+  nodes.forEach(node=>{
+    const isRed=node.color==='red';
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;gap:.5rem;font-size:12.5px;line-height:1.45;';
+    row.innerHTML=`<span style="color:${isRed?'var(--terra)':'var(--foret)'};flex-shrink:0;">●</span><span><strong style="color:${isRed?'var(--terra)':'var(--foret)'};font-weight:600;">${node.label} :</strong> ${node.value}</span>`;
+    list.appendChild(row);
+  });
+  card.appendChild(list);
+
   const footer=document.createElement('div');footer.className='art-kc-footer';
   const bOk=document.createElement('button');bOk.className='btn-kc-ok';bOk.textContent='Compris, continuer →';bOk.onclick=()=>{document.getElementById('agentInput').value='Compris, continuer';sendAgent();};
   const bAlt=document.createElement('button');bAlt.className='btn-kc-alt';bAlt.textContent='Expliquer différemment';bAlt.onclick=()=>{document.getElementById('agentInput').value='Expliquer différemment';sendAgent();};
@@ -829,8 +892,8 @@ function renderQCM(data){
       });
       const fb=document.createElement('div');fb.className='art-fb '+(i===data.correct?'ok':'ko');
       fb.textContent=(i===data.correct?'✓ ':'✗ ')+data.explanation;wrap.appendChild(fb);
-      // Pas de quick replies pendant l'évaluation — l'agent enchaîne automatiquement
-      setTimeout(()=>{document.getElementById('agentInput').value='Répondu';sendAgent();},800);
+      // L'agent enchaîne automatiquement l'étape suivante du script
+      setTimeout(()=>{sendAgentSilent('Continuer');},1000);
     };
     wrap.appendChild(btn);
   });
@@ -908,6 +971,7 @@ function renderDragDrop(data){
     });
     const fb=document.createElement('div');fb.className='art-fb '+(allCorrect?'ok':'ko');
     fb.textContent=(allCorrect?'✓ Parfait ! ':'✗ Pas tout à fait. ')+data.explanation;wrap.appendChild(fb);
+    setTimeout(()=>{sendAgentSilent('Continuer');},1100);
   };
   wrap.appendChild(validateBtn);
   addArtifact(wrap);
@@ -928,7 +992,7 @@ function renderScale(data){
         btns.querySelectorAll('.scale-btn').forEach(b=>{b.style.pointerEvents='none';if(parseInt(b.textContent)===data.correct)b.classList.add('correct');else if(b===btn&&val!==data.correct)b.classList.add('wrong');});
         const fb=document.createElement('div');fb.className='art-fb '+(val===data.correct?'ok':'ko');
         fb.textContent=(val===data.correct?'✓ ':'✗ ')+data.explanation;wrap.appendChild(fb);
-        setTimeout(()=>{document.getElementById('agentInput').value='Répondu';sendAgent();},800);
+        setTimeout(()=>{sendAgentSilent('Continuer');},1000);
       },300);
     };
     btns.appendChild(btn);
@@ -995,7 +1059,7 @@ const kbData={
 function showKbDomain(el,domain){
   document.querySelectorAll('.kb-domain-card').forEach(d=>d.classList.remove('active'));el.classList.add('active');
   const d=kbData[domain];
-  document.getElementById('kbSubLabel').textContent='Sous-domaines — '+d.label;
+  document.getElementById('kbSubLabel').textContent='Sous-domaines : '+d.label;
   initKbSublist(domain);
 }
 function initKbSublist(domain){
