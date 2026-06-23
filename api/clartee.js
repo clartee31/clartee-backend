@@ -239,7 +239,8 @@ const BASE_RULES = `Tu es Clartée, agent pédagogique. Règles absolues :
 - Tu produis EXACTEMENT un message : soit un court texte, soit UN artefact JSON pur (rien avant/après).
 - Tu n'inventes aucun chiffre : tu reprends fidèlement le contenu fourni.
 - Tu n'utilises JAMAIS le tiret cadratin (utilise virgule, deux-points, parenthèses).
-- Tu ne joues que le moment demandé, puis tu t'arrêtes.`;
+- Tu ne joues que le moment demandé, puis tu t'arrêtes.
+- LISIBILITÉ (messages texte uniquement) : termine chaque phrase par un retour à la ligne. Pour une liste (numérotée ou à puces), mets un retour à la ligne avant chaque élément, chaque élément sur sa propre ligne. Ces règles de mise en forme ne s'appliquent PAS au contenu d'un artefact JSON.`;
 
 // Construit les messages pour Mistral pour un moment donné
 function buildMomentMessages(kb, script, index, action) {
@@ -314,7 +315,22 @@ async function handler(req, res) {
   if (req.method === 'OPTIONS') { res.status(204).end(); return; }
   if (req.method !== 'POST') { res.status(404).json({ error: 'Not found' }); return; }
 
-  const body = req.body || {};
+  // Parsing robuste du corps : Vercel peut livrer req.body en objet, en string, ou pas du tout.
+  let body = req.body;
+  if (!body || typeof body === 'string') {
+    try {
+      if (typeof body === 'string' && body.length) {
+        body = JSON.parse(body);
+      } else {
+        // Lire le flux brut si req.body n'est pas fourni
+        const raw = await new Promise((resolve) => {
+          let d = ''; req.on('data', c => d += c); req.on('end', () => resolve(d)); req.on('error', () => resolve(''));
+        });
+        body = raw ? JSON.parse(raw) : {};
+      }
+    } catch (e) { body = {}; }
+  }
+
   const { code, module: moduleCode, mode } = body;
 
   // Mode "partager" : dialogue libre, inchangé
@@ -337,17 +353,19 @@ async function handler(req, res) {
     res.status(500).json({ error: 'Chargement module : ' + err.message }); return;
   }
 
-  // index courant (le moment à jouer), action de l'apprenant
+  // index courant (dernier moment joué), action de l'apprenant
   let index = Number.isInteger(body.index) ? body.index : 0;
   const action = body.action || '';
+  const isStart = body.start === true || /d[ée]marrer/i.test(action);
 
-  // Détermine quel moment jouer : si l'action fait avancer, on passe au suivant ; sinon on reste.
-  // Au tout premier appel (action de démarrage), on joue le moment 0.
+  // Détermine quel moment jouer.
+  // Démarrage => moment 0. Sinon, les actions "réexpliquer"/"savoir plus" restent sur le moment,
+  // toute autre action (Continuer, Bonne réponse, etc.) avance d'un cran.
   let playIndex;
-  if (action && !/d[ée]marrer/i.test(action)) {
-    playIndex = nextIndex(script, index, action);
-  } else {
+  if (isStart) {
     playIndex = 0;
+  } else {
+    playIndex = nextIndex(script, index, action);
   }
 
   // Fin du module ?

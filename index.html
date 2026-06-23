@@ -373,7 +373,6 @@
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
     <div class="login-logo">Clart<em>é</em>e</div>
-    <div class="login-client">for SIGYS</div>
     <label class="login-label">Identifiant</label>
     <input class="login-input" id="li" type="text" onkeydown="if(event.key==='Enter')doLogin()">
     <label class="login-label">Mot de passe</label>
@@ -388,7 +387,6 @@
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-text">Clart<em>é</em>e</div>
-      <div class="logo-client">for SIGYS</div>
     </div>
     <nav class="sidebar-nav" id="sidebarNav"></nav>
     <div class="sidebar-bottom">
@@ -564,6 +562,8 @@
 <script>
 const BACKEND_LOGIN='/api/login';
 const BACKEND_CLARTEE='/api/clartee';
+// Respecter les retours à la ligne simples envoyés par l'agent (lisibilité)
+if(typeof marked!=='undefined'&&marked.setOptions){ marked.setOptions({breaks:true,gfm:true}); }
 const MEDIA_BASE='/medias/';
 
 const ROLES={
@@ -636,8 +636,8 @@ function openModule(code,titre){
   document.getElementById('agentMsgs').innerHTML='';
   document.getElementById('agentQR').innerHTML='';
   goPage('agent');
-  // Lance le moment 0 (INTRO_MODULE). 'Démarrer' = signal de départ géré par le moteur.
-  setTimeout(()=>{ playMoment('Démarrer'); },200);
+  // Lance le moment 0 (INTRO_MODULE) avec le flag de démarrage explicite.
+  setTimeout(()=>{ playMoment('Démarrer', true); },200);
 }
 
 function addMsg(role,content){
@@ -673,14 +673,17 @@ function handleAgentKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();i
 
 // Envoi piloté par moment : on transmet l'index courant et l'action.
 // Le moteur décide quel moment jouer et renvoie le nouvel index.
-async function playMoment(action){
+async function playMoment(action, start){
   if(agentTyping)return;
   document.getElementById('agentQR').innerHTML='';
   agentTyping=true;document.getElementById('agentSend').disabled=true;
   showTyping();
   try{
-    const res=await fetch(BACKEND_CLARTEE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:currentCode,index:currentIndex,action:action||''})});
+    const payload={code:currentCode,index:currentIndex,action:action||''};
+    if(start) payload.start=true;
+    const res=await fetch(BACKEND_CLARTEE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const data=await res.json();hideTyping();
+    if(data.error){ addMsg('agent','Erreur : '+data.error); agentTyping=false;updateAgentSend(); return; }
     if(data.done){ agentTyping=false;updateAgentSend(); return; }
     if(typeof data.index==='number') currentIndex=data.index;
     const raw=(data.content&&data.content[0]&&data.content[0].text||'').trim();
