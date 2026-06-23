@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clartée · SIGYS</title>
+  <title>Clartée</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Caladea:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -208,6 +208,59 @@
     .art-fb{font-size:12.5px;margin-top:9px;padding:8px 12px;border-radius:8px;line-height:1.5;}
     .art-fb.ok{background:var(--foret-light);color:var(--foret);}
     .art-fb.ko{background:var(--terra-light);color:var(--terra);}
+
+    /* ARTEFACTS CLARTÉE VALIDÉS */
+    .art-wrap{max-width:92%;width:100%;}
+    /* Barre d'actions de transmission */
+    .art-actions{display:flex;gap:.5rem;flex-wrap:wrap;padding:.75rem 0 0;}
+    .btn-ok{padding:8px 18px;border-radius:30px;background:var(--terra);color:#fff;border:none;font-family:var(--font-body);font-size:12.5px;font-weight:500;cursor:pointer;transition:background .15s;}
+    .btn-ok:hover{background:var(--terra-dark);}
+    .btn-alt{padding:8px 18px;border-radius:30px;background:var(--cream);color:var(--ink-mid);border:none;font-family:var(--font-body);font-size:12.5px;cursor:pointer;transition:all .15s;}
+    .btn-alt:hover{background:var(--terra);color:#fff;}
+    .btn-more{padding:8px 18px;border-radius:30px;background:#fff;color:var(--foret);border:1.5px solid var(--foret);font-family:var(--font-body);font-size:12.5px;font-weight:500;cursor:pointer;transition:all .15s;}
+    .btn-more:hover{background:var(--foret-light);}
+
+    /* VIGNETTE */
+    .art-vignette{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+    .vig-media{background:var(--cream);padding:1.1rem;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border);}
+    .vig-media img{max-width:100%;max-height:230px;height:auto;display:block;}
+    .vig-body{padding:1rem 1.25rem;}
+    .vig-title{font-family:var(--font-display);font-size:1.15rem;font-weight:400;color:var(--foret);margin-bottom:.5rem;}
+    .vig-text{font-size:13px;color:var(--ink-mid);line-height:1.6;}
+    .vig-caption{font-size:11px;color:var(--ink-light);font-style:italic;margin-top:.6rem;padding-top:.5rem;border-top:1px solid var(--border);}
+    .art-vignette .art-actions{padding:.75rem 1.25rem;border-top:1px solid var(--border);margin-top:0;}
+
+    /* TEXTE */
+    .art-texte{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+    .txt-body{padding:1.25rem 1.4rem 1rem;}
+    .txt-title{font-family:var(--font-display);font-size:1.2rem;font-weight:400;color:var(--foret);margin-bottom:.65rem;}
+    .txt-para{font-size:13.5px;color:var(--ink-mid);line-height:1.7;}
+    .txt-caption{font-size:11px;color:var(--ink-light);font-style:italic;margin-top:.7rem;padding-top:.55rem;border-top:1px solid var(--border);}
+    .art-texte .art-actions{padding:.75rem 1.4rem;border-top:1px solid var(--border);margin-top:0;}
+
+    /* DRAGDROP */
+    .dd-instr{font-size:13px;color:var(--ink);margin-bottom:1rem;line-height:1.45;}
+    .dd-pool{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:1rem;min-height:50px;padding:10px;background:var(--cream);border-radius:10px;align-items:flex-start;}
+    .dd-item{padding:7px 12px;background:var(--cream-dark);border:1px solid var(--ink-light);border-radius:8px;font-size:12px;color:var(--ink-mid);cursor:grab;user-select:none;transition:all .15s;}
+    .dd-item:hover{background:#fff;border-color:var(--ink-mid);}
+    .dd-item.dragging{opacity:.4;}
+    .dd-targets{display:flex;flex-direction:column;gap:8px;}
+    .dd-target{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1.5px dashed var(--border);border-radius:10px;min-height:46px;transition:all .15s;}
+    .dd-target.over{border-color:var(--terra);background:var(--terra-light);}
+    .dd-target-label{font-size:12.5px;font-weight:500;color:var(--ink);min-width:90px;}
+    .dd-slot{flex:1;min-height:30px;display:flex;align-items:center;}
+    .dd-validate{margin-top:1rem;padding:9px 22px;border-radius:30px;background:var(--terra);color:#fff;border:none;font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;}
+    .dd-validate:hover{background:var(--terra-dark);}
+
+    /* SCALE */
+    .sc-row{display:flex;gap:7px;margin-bottom:.55rem;}
+    .sc-btn{flex:1;border:1px solid var(--border);border-radius:10px;background:var(--cream);font-family:var(--font-body);font-weight:500;color:var(--ink-mid);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;padding:11px 4px;font-size:13px;}
+    .sc-btn.num{font-size:15px;aspect-ratio:1;flex:0 0 auto;width:46px;}
+    .sc-btn:hover{background:var(--foret-light);border-color:var(--foret);color:var(--foret);}
+    .sc-btn.correct{background:var(--foret-light);border-color:var(--foret);color:var(--foret);}
+    .sc-btn.wrong{background:var(--terra-light);border-color:var(--terra);color:var(--terra-dark);}
+    .sc-btn.dim{opacity:.4;}
+    .sc-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-light);margin-top:2px;}
     .uc-sit{background:var(--foret-light);border-left:3px solid var(--foret);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12.5px;margin-bottom:.75rem;line-height:1.5;}
     .uc-sit-lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--foret);font-weight:500;display:block;margin-bottom:3px;}
     .uc-textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font-body);resize:vertical;outline:none;min-height:65px;background:var(--cream);}
@@ -219,8 +272,8 @@
     .dd-area{display:flex;gap:12px;margin-bottom:9px;}
     .dd-items{display:flex;flex-direction:column;gap:5px;flex:1;}
     .dd-targets{display:flex;flex-direction:column;gap:5px;flex:1;}
-    .dd-item{padding:7px 10px;background:var(--cream-dark);border:1px solid var(--ink-light);border-radius:8px;font-size:12px;cursor:grab;user-select:none;color:var(--ink-mid);transition:all .15s;}
-    .dd-item:hover{background:var(--cream);border-color:var(--ink-mid);}
+    .dd-item{padding:7px 10px;background:var(--foret-light);border:1px solid var(--foret);border-radius:8px;font-size:12px;cursor:grab;user-select:none;color:var(--foret);transition:all .15s;}
+    .dd-item:hover{background:var(--foret);color:white;}
     .dd-target{padding:7px 10px;border:2px dashed var(--border);border-radius:8px;font-size:12px;min-height:36px;transition:all .15s;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
     .dd-target.over{border-color:var(--foret);background:var(--foret-light);}
     .dd-validate{padding:8px 18px;border-radius:30px;background:var(--terra);color:white;border:none;font-size:13px;font-family:var(--font-body);cursor:pointer;transition:background .15s;}
@@ -313,31 +366,6 @@
     .pv-edit{width:24px;height:24px;border-radius:6px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;}
     .pv-edit i{font-size:13px;color:var(--ink-light);}
     .pv-edit:hover i{color:var(--terra);}
-
-    /* HAMBURGER */
-    .hamburger{display:none;width:36px;height:36px;border-radius:8px;border:none;background:var(--cream);cursor:pointer;align-items:center;justify-content:center;flex-shrink:0;}
-    .hamburger i{font-size:20px;color:var(--foret);}
-
-    /* OVERLAY mobile */
-    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(28,25,22,.45);z-index:49;-webkit-tap-highlight-color:transparent;}
-    .sidebar-overlay.open{display:block;}
-
-    /* MOBILE */
-    @media(max-width:700px){
-      .hamburger{display:flex;}
-      .top-name{display:none;}
-      .sidebar{
-        position:fixed;top:0;left:0;height:100%;z-index:50;
-        transform:translateX(-100%);transition:transform .25s ease;
-        width:220px;
-      }
-      .sidebar.open{transform:translateX(0);}
-      .main{width:100%;}
-      .domains-grid{grid-template-columns:1fr;}
-      .suivi-grid{grid-template-columns:1fr;}
-      .chat-win{height:calc(100vh - 160px);}
-      .content{padding:.875rem;}
-    }
   </style>
 </head>
 <body>
@@ -356,10 +384,8 @@
   </div>
 </div>
 
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-
 <div class="app" id="appWrap" style="display:none;">
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-text">Clart<em>é</em>e</div>
       <div class="logo-client">for SIGYS</div>
@@ -377,7 +403,6 @@
 
   <main class="main">
     <div class="topbar">
-      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></button>
       <div class="search-wrap">
         <i class="ti ti-search"></i>
         <input type="text" placeholder="Rechercher ou poser une question...">
@@ -411,16 +436,15 @@
       <div class="page" id="page-formation">
         <div class="page-title">Se former</div>
         <div class="sec-label">Parcours affectés</div>
-        <div class="parcours-item" onclick="openTheme('green','green_eau')"><div class="parcours-ico" style="background:#2D6B3A;"><i class="ti ti-leaf"></i></div><span class="parcours-name">Green Déclic : Crise de l'eau</span><span class="parcours-prog">Nouveau</span></div>
-        <div class="parcours-item" onclick="openTheme('onboarding','sigys')"><div class="parcours-ico"><i class="ti ti-route"></i></div><span class="parcours-name">Onboarding atelier : nouveau collaborateur</span><span class="parcours-prog">3 / 8 étapes</span></div>
-        <div class="parcours-item" onclick="openTheme('ops','machines')"><div class="parcours-ico"><i class="ti ti-shield-check"></i></div><span class="parcours-name">Sécurité machines</span><span class="parcours-prog">0 / 5 étapes</span></div>
+        <div class="parcours-item" onclick="openModule('k11','Green Déclic : La crise de l\'eau')"><div class="parcours-ico"><i class="ti ti-droplet"></i></div><span class="parcours-name">Green Déclic : La crise de l'eau</span><span class="parcours-prog">Module K11</span></div>
+        <div class="parcours-item" onclick="openModule('k11','Green Déclic : La crise de l\'eau')"><div class="parcours-ico"><i class="ti ti-route"></i></div><span class="parcours-name">Onboarding atelier : nouveau collaborateur</span><span class="parcours-prog">3 / 8 étapes</span></div>
         <div class="sec-label" style="margin-top:.9rem;">Tous les thèmes</div>
-        <div class="theme-item" onclick="openTheme('onboarding','sigys')"><div class="theme-ico"><i class="ti ti-door-enter"></i></div><div class="theme-info"><div class="theme-name">L'entreprise SIGYS</div><div class="theme-domain">Onboarding</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill g" style="width:40%"></div></div><span class="prog-pct">40%</span></div></div>
-        <div class="theme-item" onclick="openTheme('onboarding','regles')"><div class="theme-ico"><i class="ti ti-tools"></i></div><div class="theme-info"><div class="theme-name">Règles & outils</div><div class="theme-domain">Onboarding</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill g" style="width:20%"></div></div><span class="prog-pct">20%</span></div></div>
-        <div class="theme-item" onclick="openTheme('onboarding','qualite')"><div class="theme-ico"><i class="ti ti-award"></i></div><div class="theme-info"><div class="theme-name">Culture qualité</div><div class="theme-domain">Onboarding</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill g" style="width:0%"></div></div><span class="prog-pct">0%</span></div></div>
-        <div class="theme-item" onclick="openTheme('ops','materiaux')"><div class="theme-ico"><i class="ti ti-box"></i></div><div class="theme-info"><div class="theme-name">Matériaux</div><div class="theme-domain">Savoir-faire opérationnels</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill t" style="width:20%"></div></div><span class="prog-pct">20%</span></div></div>
-        <div class="theme-item" onclick="openTheme('ops','machines')"><div class="theme-ico"><i class="ti ti-settings"></i></div><div class="theme-info"><div class="theme-name">Machines & outils</div><div class="theme-domain">Savoir-faire opérationnels</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill t" style="width:0%"></div></div><span class="prog-pct">0%</span></div></div>
-        <div class="theme-item" onclick="openTheme('ops','fabrication')"><div class="theme-ico"><i class="ti ti-hammer"></i></div><div class="theme-info"><div class="theme-name">Fabrication</div><div class="theme-domain">Savoir-faire opérationnels</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill t" style="width:0%"></div></div><span class="prog-pct">0%</span></div></div>
+        <div class="theme-item" onclick="openModule('k11','Green Déclic : La crise de l\'eau')"><div class="theme-ico"><i class="ti ti-door-enter"></i></div><div class="theme-info"><div class="theme-name">L'entreprise SIGYS</div><div class="theme-domain">Onboarding</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill g" style="width:40%"></div></div><span class="prog-pct">40%</span></div></div>
+        <div class="theme-item" onclick="openModule('k11','Green Déclic : La crise de l\'eau')"><div class="theme-ico"><i class="ti ti-tools"></i></div><div class="theme-info"><div class="theme-name">Règles & outils</div><div class="theme-domain">Onboarding</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill g" style="width:20%"></div></div><span class="prog-pct">20%</span></div></div>
+        <div class="theme-item" onclick="openModule('k11','Green Déclic : La crise de l\'eau')"><div class="theme-ico"><i class="ti ti-award"></i></div><div class="theme-info"><div class="theme-name">Culture qualité</div><div class="theme-domain">Onboarding</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill g" style="width:0%"></div></div><span class="prog-pct">0%</span></div></div>
+        <div class="theme-item" onclick="openModule('k11','Green Déclic : La crise de l\'eau')"><div class="theme-ico"><i class="ti ti-box"></i></div><div class="theme-info"><div class="theme-name">Matériaux</div><div class="theme-domain">Savoir-faire opérationnels</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill t" style="width:20%"></div></div><span class="prog-pct">20%</span></div></div>
+        <div class="theme-item" onclick="openModule('k11','Green Déclic : La crise de l\'eau')"><div class="theme-ico"><i class="ti ti-settings"></i></div><div class="theme-info"><div class="theme-name">Machines & outils</div><div class="theme-domain">Savoir-faire opérationnels</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill t" style="width:0%"></div></div><span class="prog-pct">0%</span></div></div>
+        <div class="theme-item" onclick="openModule('k11','Green Déclic : La crise de l\'eau')"><div class="theme-ico"><i class="ti ti-hammer"></i></div><div class="theme-info"><div class="theme-name">Fabrication</div><div class="theme-domain">Savoir-faire opérationnels</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill t" style="width:0%"></div></div><span class="prog-pct">0%</span></div></div>
         <div class="done-label">Terminés</div>
         <div class="theme-item done"><div class="theme-ico"><i class="ti ti-award"></i></div><div class="theme-info"><div class="theme-name">Culture qualité</div><div class="theme-domain">Onboarding</div></div><div class="theme-prog"><div class="prog-bar"><div class="prog-fill g" style="width:100%"></div></div><span class="prog-pct" style="color:var(--ink-light)">100%</span></div></div>
       </div>
@@ -538,20 +562,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-function toggleSidebar(){
-  const s=document.getElementById('sidebar');
-  const o=document.getElementById('sidebarOverlay');
-  const open=s.classList.toggle('open');
-  o.classList.toggle('open',open);
-}
-
-function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('open');
-}
-
 const BACKEND_LOGIN='/api/login';
-const BACKEND_CHAT='/api/chat';
+const BACKEND_CLARTEE='/api/clartee';
+const MEDIA_BASE='/medias/';
 
 const ROLES={
   collaborateur:{user:'Marie',init:'M',nav:[{id:'accueil',icon:'ti-home',label:'Accueil'},{id:'formation',icon:'ti-book',label:'Se former'},{id:'partager',icon:'ti-bulb',label:'Partager'}]},
@@ -562,7 +575,7 @@ const ROLES={
 let currentRole='collaborateur',currentPage='accueil';
 let agentHistory=[],partagerHistory=[];
 let agentTyping=false,partagerTyping=false;
-let currentDomain='',currentTheme='';
+let currentCode='';
 let draggedItem=null;
 
 async function doLogin(){
@@ -604,7 +617,6 @@ function goPage(id){
   const labels={accueil:'Accueil',formation:'Se former',partager:'Partager',validation:'File de validation',base:'Base de connaissances',parcours:'Parcours',apprenants:'Suivi des apprenants'};
   document.querySelectorAll('.nav-item').forEach(n=>{if(n.textContent.trim()===labels[id])n.classList.add('active');});
   currentPage=id;
-  closeSidebar();
 }
 
 function switchRole(role){
@@ -616,18 +628,15 @@ function switchRole(role){
 }
 
 // AGENT FORMATION
-function openTheme(domain,theme){
-  currentDomain=domain;currentTheme=theme;
+function openModule(code,titre){
+  currentCode=code;
   agentHistory=[];
-  const labels={sigys:"L'entreprise SIGYS",regles:"Règles & outils",qualite:"Culture qualité",materiaux:"Matériaux",machines:"Machines & outils",fabrication:"Fabrication",green_eau:"Green Déclic : Crise de l'eau"};
-  document.getElementById('agentThemeTitle').textContent=labels[theme]||theme;
+  document.getElementById('agentThemeTitle').textContent=titre||code;
   document.getElementById('agentMsgs').innerHTML='';
   document.getElementById('agentQR').innerHTML='';
   goPage('agent');
-  setTimeout(()=>{
-    addMsg('agent','Bonjour ! Comment souhaitez-vous aborder ce thème ?');
-    setQR(['Évaluer mon niveau','Commencer directement']);
-  },200);
+  // Le script démarre par INTRO_MODULE : on lance l'agent avec un signal de démarrage
+  setTimeout(()=>{ sendAgentSilent('Démarrer le module'); },200);
 }
 
 function addMsg(role,content){
@@ -644,7 +653,7 @@ function setQR(opts){
   const qr=document.getElementById('agentQR');qr.innerHTML='';
   opts.forEach(opt=>{
     const btn=document.createElement('button');btn.className='qr-btn';btn.textContent=opt;
-    btn.onclick=()=>{qr.innerHTML='';document.getElementById('agentInput').value=opt;sendAgent();};
+    btn.onclick=()=>{qr.innerHTML='';sendAgentSilent(opt);};
     qr.appendChild(btn);
   });
 }
@@ -670,7 +679,7 @@ async function sendAgent(){
   agentHistory.push({role:'user',content:text});
   showTyping();
   try{
-    const res=await fetch(BACKEND_CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domain:currentDomain,theme:currentTheme,messages:agentHistory})});
+    const res=await fetch(BACKEND_CLARTEE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:currentCode,messages:agentHistory})});
     const data=await res.json();hideTyping();
     const raw=data.content[0].text.trim();
     agentHistory.push({role:'assistant',content:raw});
@@ -679,7 +688,7 @@ async function sendAgent(){
   agentTyping=false;updateAgentSend();
 }
 
-// Relance automatique de l'agent SANS afficher de message utilisateur (enchaînement de script)
+// Envoie un signal à l'agent SANS afficher de bulle utilisateur (Démarrer, Continuer, Me réexpliquer, Répondu...)
 async function sendAgentSilent(signal){
   if(agentTyping)return;
   document.getElementById('agentQR').innerHTML='';
@@ -687,7 +696,7 @@ async function sendAgentSilent(signal){
   agentHistory.push({role:'user',content:signal});
   showTyping();
   try{
-    const res=await fetch(BACKEND_CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domain:currentDomain,theme:currentTheme,messages:agentHistory})});
+    const res=await fetch(BACKEND_CLARTEE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:currentCode,messages:agentHistory})});
     const data=await res.json();hideTyping();
     const raw=data.content[0].text.trim();
     agentHistory.push({role:'assistant',content:raw});
@@ -696,66 +705,46 @@ async function sendAgentSilent(signal){
   agentTyping=false;updateAgentSend();
 }
 
-function renderParsed(parsed,raw){
-  switch(parsed.type){
-    case 'definition': renderDefinition(parsed); break;
-    case 'knowledge_card': renderKnowledgeCard(parsed); break;
-    case 'usecase_read': renderUsecaseRead(parsed); break;
-    case 'key_numbers': renderKeyNumbers(parsed); break;
-    case 'qcm': renderQCM(parsed); break;
-    case 'usecase': renderUseCase(parsed); break;
-    case 'dragdrop': renderDragDrop(parsed); break;
-    case 'scale': renderScale(parsed); break;
-    case 'map_update':
-      if(parsed.message)addMsg('agent',parsed.message);
-      break;
-    default: if(raw)addMsg('agent',raw);
-  }
-}
+
+// ════════════════════════════════════════════════════════════════════
+//  MOTEUR D'AFFICHAGE DES ARTEFACTS CLARTÉE (5 types validés)
+// ════════════════════════════════════════════════════════════════════
+
+function resolveMedia(name){ return name ? (MEDIA_BASE + name) : null; }
 
 function handleResponse(raw){
-  // Cas 1 : le message entier est un JSON pur
-  const whole=raw.match(/^\s*(\{[\s\S]*\})\s*$/);
-  if(whole){
-    try{ renderParsed(JSON.parse(whole[1]),raw); return; }catch(e){}
-  }
+  // Un message = soit texte, soit UN artefact JSON pur. On tente d'extraire un objet JSON.
+  let parsed=null;
+  const match=raw.match(/\{[\s\S]*\}/);
+  if(match){ try{ parsed=JSON.parse(match[0]); }catch(e){ parsed=null; } }
 
-  // Cas 2 : texte + un ou plusieurs blocs JSON mélangés.
-  // On extrait chaque objet JSON équilibré, on affiche le texte intercalé comme message.
-  let i=0, lastEnd=0, found=false;
-  while(i<raw.length){
-    if(raw[i]==='{'){
-      // chercher l'accolade fermante équilibrée
-      let depth=0,j=i,inStr=false,esc=false;
-      for(;j<raw.length;j++){
-        const c=raw[j];
-        if(inStr){ if(esc)esc=false; else if(c==='\\')esc=true; else if(c==='"')inStr=false; }
-        else { if(c==='"')inStr=true; else if(c==='{')depth++; else if(c==='}'){depth--; if(depth===0){j++;break;}} }
-      }
-      const candidate=raw.slice(i,j);
-      let obj=null;
-      try{ obj=JSON.parse(candidate); }catch(e){}
-      if(obj&&obj.type){
-        // texte avant le bloc
-        const before=raw.slice(lastEnd,i).trim();
-        if(before)addMsg('agent',before);
-        renderParsed(obj,null);
-        found=true; lastEnd=j; i=j; continue;
-      }
-    }
-    i++;
-  }
-  if(found){
-    const after=raw.slice(lastEnd).trim();
-    if(after)addMsg('agent',after);
+  if(!parsed||!parsed.type){
+    // Message texte (INTRO_MODULE, INTRO_SEQUENCE, reformulation, dialogue...)
+    addMsg('agent',raw);
+    afterTextMessage(raw);
     return;
   }
 
-  // Cas 3 : pas de JSON exploitable, afficher tel quel
-  addMsg('agent',raw);
+  switch(parsed.type){
+    case 'qcm': renderQCM(parsed); break;
+    case 'vignette': renderVignette(parsed); break;
+    case 'texte': renderTexte(parsed); break;
+    case 'dragdrop': renderDragDrop(parsed); break;
+    case 'scale': renderScale(parsed); break;
+    default: addMsg('agent', parsed.message || raw); afterTextMessage(parsed.message || raw);
+  }
 }
 
-// ── ARTEFACTS TRANSMISSION ────────────────────────────────────────
+// Après un message texte de l'agent : proposer « Continuer » sauf si l'agent pose une question
+// (dans ce cas l'apprenant tape sa réponse, ex. dialogue « Me réexpliquer »).
+function afterTextMessage(text){
+  const t=(text||'').trim();
+  const isQuestion=/[?？]\s*$/.test(t);
+  if(isQuestion){ document.getElementById('agentQR').innerHTML=''; return; }
+  setQR(['Continuer']);
+}
+
+// Conteneur d'artefact aligné côté agent
 function addArtifact(el){
   const msgs=document.getElementById('agentMsgs');
   const div=document.createElement('div');div.className='msg';
@@ -764,98 +753,33 @@ function addArtifact(el){
   div.appendChild(av);div.appendChild(wrap);msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
 }
 
-function transButtons(onOk,onAlt){
-  const row=document.createElement('div');row.style.cssText='display:flex;gap:.6rem;margin-top:.9rem;';
-  const bOk=document.createElement('button');bOk.className='btn-trans-ok';bOk.textContent='Compris, continuer →';bOk.onclick=onOk;
-  const bAlt=document.createElement('button');bAlt.className='btn-trans-alt';bAlt.textContent='Expliquer différemment';bAlt.onclick=onAlt;
-  row.appendChild(bOk);row.appendChild(bAlt);return row;
-}
-
-function renderDefinition(d){
-  const card=document.createElement('div');card.className='art-def';
-  card.innerHTML=`<div class="art-def-label">${d.label||'Concept clé'}</div><div class="art-def-title">${d.title}</div><div class="art-def-body">${d.body}</div>`;
-  if(d.points&&d.points.length){
-    const ul=document.createElement('ul');ul.className='art-def-points';
-    d.points.forEach(p=>{const li=document.createElement('li');li.className='art-def-point';li.textContent=p;ul.appendChild(li);});
-    card.appendChild(ul);
+// Barre de boutons de transmission : Continuer / Me réexpliquer / (En savoir plus)
+function transmitActions(more){
+  const row=document.createElement('div');row.className='art-actions';
+  const bOk=document.createElement('button');bOk.className='btn-ok';bOk.textContent='Continuer →';
+  bOk.onclick=()=>{disableRow(row);sendAgentSilent('Continuer');};
+  const bAlt=document.createElement('button');bAlt.className='btn-alt';bAlt.textContent='Me réexpliquer';
+  bAlt.onclick=()=>{disableRow(row);sendAgentSilent('Me réexpliquer');};
+  row.appendChild(bOk);row.appendChild(bAlt);
+  if(more){
+    const bMore=document.createElement('button');bMore.className='btn-more';bMore.textContent='En savoir plus';
+    bMore.onclick=()=>{disableRow(row);sendAgentSilent('En savoir plus');};
+    row.appendChild(bMore);
   }
-  card.appendChild(transButtons(
-    ()=>{document.getElementById('agentInput').value='Compris, continuer';sendAgent();},
-    ()=>{document.getElementById('agentInput').value='Expliquer différemment';sendAgent();}
-  ));
-  addArtifact(card);
+  return row;
 }
+function disableRow(row){ row.querySelectorAll('button').forEach(b=>{b.disabled=true;b.style.opacity='.5';b.style.pointerEvents='none';}); }
 
-function renderKnowledgeCard(d){
-  const card=document.createElement('div');card.className='art-kc';
-  const header=document.createElement('div');header.className='art-kc-header';
-  header.innerHTML=`<div class="art-kc-title">${d.title}</div><div class="art-kc-intro">${d.intro||''}</div>`;
-  card.appendChild(header);
-
-  // Rendu en blocs verticaux propres (plus de SVG en étoile qui débordait)
-  const list=document.createElement('div');
-  list.style.cssText='padding:.9rem 1rem;display:flex;flex-direction:column;gap:.5rem;';
-  (d.nodes||[]).forEach(node=>{
-    const isRed=node.color==='red';
-    const block=document.createElement('div');
-    block.style.cssText=`border-left:3px solid ${isRed?'var(--terra)':'var(--foret)'};background:${isRed?'var(--terra-light)':'var(--foret-light)'};border-radius:0 8px 8px 0;padding:.55rem .8rem;`;
-    block.innerHTML=`<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:${isRed?'var(--terra)':'var(--foret)'};margin-bottom:2px;">${node.label}</div><div style="font-size:12.5px;color:var(--ink);line-height:1.45;">${node.value}</div>`;
-    list.appendChild(block);
-  });
-  card.appendChild(list);
-
-  const footer=document.createElement('div');footer.className='art-kc-footer';
-  const bOk=document.createElement('button');bOk.className='btn-kc-ok';bOk.textContent='Compris, continuer →';bOk.onclick=()=>{document.getElementById('agentInput').value='Compris, continuer';sendAgent();};
-  const bAlt=document.createElement('button');bAlt.className='btn-kc-alt';bAlt.textContent='Expliquer différemment';bAlt.onclick=()=>{document.getElementById('agentInput').value='Expliquer différemment';sendAgent();};
-  footer.appendChild(bOk);footer.appendChild(bAlt);card.appendChild(footer);
-  addArtifact(card);
-}
-
-function renderUsecaseRead(d){
-  const card=document.createElement('div');card.className='art-uc';
-  card.innerHTML=`<div class="art-uc-label">${d.label||'Cas concret SIGYS'}</div>
-  <div class="art-uc-grid">
-    <div class="art-uc-col"><div class="art-uc-col-label neutral">Situation</div>${d.situation}</div>
-    <div class="art-uc-col"><div class="art-uc-col-label neutral">Action réalisée</div>${d.action}</div>
-    <div class="art-uc-col">
-      <div class="art-uc-col-label pos">✓ Ce qui a bien fonctionné</div><div style="font-size:12px;line-height:1.5;margin-bottom:.5rem;">${d.positive}</div>
-      <div class="art-uc-col-label neg">✗ Risque si mal géré</div><div style="font-size:12px;line-height:1.5;">${d.negative}</div>
-    </div>
-  </div>`;
-  const footer=document.createElement('div');footer.className='art-uc-footer';
-  const bOk=document.createElement('button');bOk.className='btn-kc-ok';bOk.textContent='Compris, continuer →';bOk.onclick=()=>{document.getElementById('agentInput').value='Compris, continuer';sendAgent();};
-  const bAlt=document.createElement('button');bAlt.className='btn-kc-alt';bAlt.textContent='Expliquer différemment';bAlt.onclick=()=>{document.getElementById('agentInput').value='Expliquer différemment';sendAgent();};
-  footer.appendChild(bOk);footer.appendChild(bAlt);card.appendChild(footer);
-  addArtifact(card);
-}
-
-function renderKeyNumbers(d){
-  const card=document.createElement('div');card.className='art-kn';
-  card.innerHTML=`<div class="art-kn-label">${d.label||'À retenir'}</div>`;
-  const grid=document.createElement('div');grid.className='art-kn-grid';
-  (d.numbers||[]).slice(0,2).forEach(n=>{
-    const item=document.createElement('div');item.className='art-kn-item';
-    item.innerHTML=`<div class="art-kn-num ${n.color==='red'?'r':'g'}">${n.value}</div><div class="art-kn-desc">${n.desc}</div>`;
-    grid.appendChild(item);
-  });
-  card.appendChild(grid);
-  const footer=document.createElement('div');footer.className='art-kn-footer';
-  const bOk=document.createElement('button');bOk.className='btn-kc-ok';bOk.textContent='Compris, continuer →';bOk.onclick=()=>{document.getElementById('agentInput').value='Compris, continuer';sendAgent();};
-  const bAlt=document.createElement('button');bAlt.className='btn-kc-alt';bAlt.textContent='Expliquer différemment';bAlt.onclick=()=>{document.getElementById('agentInput').value='Expliquer différemment';sendAgent();};
-  footer.appendChild(bOk);footer.appendChild(bAlt);card.appendChild(footer);
-  addArtifact(card);
-}
-
-// ── ARTEFACTS ÉVALUATION ──────────────────────────────────────────
+// ── 1. QCM ──────────────────────────────────────────────────────────
 function renderQCM(data){
   const wrap=document.createElement('div');wrap.className='art-eval';
   const lbl=document.createElement('div');lbl.className='art-eval-label';lbl.textContent='Question';wrap.appendChild(lbl);
   const q=document.createElement('div');q.className='art-eval-q';q.textContent=data.question;wrap.appendChild(q);
   let answered=false;
-  data.options.forEach((opt,i)=>{
+  (data.options||[]).forEach((opt,i)=>{
     const btn=document.createElement('button');btn.className='qcm-opt';
     const letter=document.createElement('div');letter.className='qcm-letter';letter.textContent=String.fromCharCode(65+i);
-    const span=document.createElement('span');span.textContent=opt.replace(/^[A-D]\.\s*/,'');
+    const span=document.createElement('span');span.textContent=opt.replace(/^[A-Z]\.\s*/,'');
     btn.appendChild(letter);btn.appendChild(span);
     btn.onclick=()=>{
       if(answered)return;answered=true;
@@ -863,126 +787,157 @@ function renderQCM(data){
         b.disabled=true;b.style.pointerEvents='none';
         if(j===data.correct)b.classList.add('correct');
         else if(j===i&&i!==data.correct)b.classList.add('wrong');
+        else b.style.opacity='.5';
       });
-      const fb=document.createElement('div');fb.className='art-fb '+(i===data.correct?'ok':'ko');
-      fb.textContent=(i===data.correct?'✓ ':'✗ ')+data.explanation;wrap.appendChild(fb);
-      // L'agent enchaîne automatiquement l'étape suivante du script
-      setTimeout(()=>{sendAgentSilent('Continuer');},1000);
+      const ok=(i===data.correct);
+      const fb=document.createElement('div');fb.className='art-fb '+(ok?'ok':'ko');
+      fb.textContent=(ok?'✓ ':'✗ ')+(data.explanation||'');wrap.appendChild(fb);
+      // L'agent reformule la notion puis propose Continuer/Me réexpliquer (géré côté script)
+      setTimeout(()=>sendAgentSilent(ok?'Bonne réponse':'Mauvaise réponse'),900);
     };
     wrap.appendChild(btn);
   });
   addArtifact(wrap);
 }
 
-function renderUseCase(data){
-  const wrap=document.createElement('div');wrap.className='art-eval';
-  const lbl=document.createElement('div');lbl.className='art-eval-label';lbl.textContent='Mise en situation';wrap.appendChild(lbl);
-  const sit=document.createElement('div');sit.className='uc-sit';sit.innerHTML=`<span class="uc-sit-lbl">Contexte</span>${data.situation}`;wrap.appendChild(sit);
-  const q=document.createElement('div');q.className='art-eval-q';q.textContent=data.question;wrap.appendChild(q);
-  const textarea=document.createElement('textarea');textarea.className='uc-textarea';textarea.placeholder='Votre réponse...';wrap.appendChild(textarea);
-  const hint=document.createElement('span');hint.className='uc-hint';hint.textContent='💡 Voir un indice';
-  let hintShown=false;hint.onclick=()=>{if(!hintShown){hintShown=true;hint.textContent='💡 '+data.hint;}};wrap.appendChild(hint);
-  let submitted=false;
-  const submit=document.createElement('button');submit.className='uc-submit';submit.textContent='Valider ma réponse';
-  submit.onclick=async()=>{
-    if(submitted||!textarea.value.trim())return;submitted=true;textarea.disabled=true;submit.disabled=true;
-    agentHistory.push({role:'user',content:'Ma réponse : '+textarea.value.trim()});
-    agentTyping=true;showTyping();
-    try{
-      const res=await fetch(BACKEND_CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domain:currentDomain,theme:currentTheme,messages:agentHistory})});
-      const d2=await res.json();hideTyping();
-      const raw=d2.content[0].text.trim();
-      agentHistory.push({role:'assistant',content:raw});
-      const fb=document.createElement('div');fb.className='art-fb ok';fb.style.marginTop='9px';
-      fb.innerHTML=typeof marked!=='undefined'?marked.parse(raw):raw;wrap.appendChild(fb);
-    }catch(err){hideTyping();addMsg('agent','Erreur : '+err.message);}
-    agentTyping=false;updateAgentSend();
-  };
-  wrap.appendChild(submit);
-  addArtifact(wrap);
+// ── 2. VIGNETTE (transmission avec média) ───────────────────────────
+function renderVignette(data){
+  const card=document.createElement('div');card.className='art-vignette';
+  if(data.media){
+    const mediaWrap=document.createElement('div');mediaWrap.className='vig-media';
+    const img=document.createElement('img');img.src=resolveMedia(data.media);img.alt=data.caption||data.title||'';
+    img.onerror=()=>{mediaWrap.style.display='none';};
+    mediaWrap.appendChild(img);card.appendChild(mediaWrap);
+  }
+  const body=document.createElement('div');body.className='vig-body';
+  if(data.title){const t=document.createElement('div');t.className='vig-title';t.textContent=data.title;body.appendChild(t);}
+  if(data.text){const p=document.createElement('div');p.className='vig-text';p.textContent=data.text;body.appendChild(p);}
+  if(data.caption||data.source){
+    const c=document.createElement('div');c.className='vig-caption';
+    c.textContent=(data.caption||'')+(data.source?' · Source : '+data.source:'');
+    body.appendChild(c);
+  }
+  card.appendChild(body);
+  card.appendChild(transmitActions(!!data.more));
+  addArtifact(card);
 }
 
+// ── 3. TEXTE (transmission sans média) ──────────────────────────────
+function renderTexte(data){
+  const card=document.createElement('div');card.className='art-texte';
+  const body=document.createElement('div');body.className='txt-body';
+  if(data.title){const t=document.createElement('div');t.className='txt-title';t.textContent=data.title;body.appendChild(t);}
+  if(data.text){const p=document.createElement('div');p.className='txt-para';p.textContent=data.text;body.appendChild(p);}
+  if(data.source){const c=document.createElement('div');c.className='txt-caption';c.textContent='Source : '+data.source;body.appendChild(c);}
+  card.appendChild(body);
+  card.appendChild(transmitActions(!!data.more));
+  addArtifact(card);
+}
+
+// ── 4. DRAGDROP (évaluation par correspondances) ────────────────────
 function renderDragDrop(data){
   const wrap=document.createElement('div');wrap.className='art-eval';
   const lbl=document.createElement('div');lbl.className='art-eval-label';lbl.textContent='Correspondances';wrap.appendChild(lbl);
-  const instr=document.createElement('div');instr.style.cssText='font-size:13px;color:var(--ink-mid);margin-bottom:.75rem;';instr.textContent=data.instruction;wrap.appendChild(instr);
-  const area=document.createElement('div');area.className='dd-area';
-  const itemsCol=document.createElement('div');itemsCol.className='dd-items';
-  const targetsCol=document.createElement('div');targetsCol.className='dd-targets';
-  // Mélanger l'ordre d'affichage des étiquettes pour qu'elles ne soient jamais alignées avec leur bonne zone
-  const shuffledItems=[...data.items];
-  for(let i=shuffledItems.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffledItems[i],shuffledItems[j]]=[shuffledItems[j],shuffledItems[i]];}
-  // Si après mélange l'ordre reste identique aux targets via la solution, inverser les deux premiers
-  shuffledItems.forEach(item=>{
+  const instr=document.createElement('div');instr.className='dd-instr';instr.textContent=data.instruction||'Glissez chaque étiquette sur la bonne zone, puis validez.';wrap.appendChild(instr);
+
+  // pool d'étiquettes neutres, mélangées
+  const pool=document.createElement('div');pool.className='dd-pool';
+  const shuffled=[...(data.items||[])].sort(()=>Math.random()-0.5);
+  let dragged=null;
+  function bindItem(el){
+    el.addEventListener('dragstart',()=>{dragged=el;setTimeout(()=>el.classList.add('dragging'),0);});
+    el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+  }
+  shuffled.forEach(item=>{
     const el=document.createElement('div');el.className='dd-item';el.textContent=item;el.draggable=true;el.dataset.item=item;
-    el.addEventListener('dragstart',()=>{draggedItem=item;el.style.opacity='.4';});
-    el.addEventListener('dragend',()=>{el.style.opacity='1';});
-    itemsCol.appendChild(el);
+    bindItem(el);pool.appendChild(el);
   });
-  data.targets.forEach(target=>{
-    const el=document.createElement('div');el.className='dd-target';el.dataset.target=target;
-    const lbl2=document.createElement('span');lbl2.style.cssText='font-size:11px;font-weight:500;color:var(--ink);';lbl2.textContent=target;el.appendChild(lbl2);
-    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('over');});
-    el.addEventListener('dragleave',()=>el.classList.remove('over'));
-    el.addEventListener('drop',e=>{
-      e.preventDefault();el.classList.remove('over');if(!draggedItem)return;
-      const existing=el.querySelector('[data-placed]');
-      if(existing){
-        // renvoyer l'ancienne étiquette dans la colonne de gauche
-        document.querySelectorAll(`[data-item="${CSS.escape(existing.dataset.placed)}"]`).forEach(d=>d.style.visibility='visible');
-        existing.remove();
-      }
-      const placed=document.createElement('div');placed.style.cssText='padding:3px 8px;background:var(--cream);border:1px solid var(--ink-light);border-radius:6px;font-size:11px;color:var(--ink-mid);';
-      placed.textContent=draggedItem;placed.dataset.placed=draggedItem;el.appendChild(placed);
-      document.querySelectorAll(`[data-item="${CSS.escape(draggedItem)}"]:not([data-placed])`).forEach(d=>d.style.visibility='hidden');
-      draggedItem=null;
+  pool.addEventListener('dragover',e=>e.preventDefault());
+  pool.addEventListener('drop',e=>{e.preventDefault();if(dragged){pool.appendChild(dragged);dragged=null;}});
+  wrap.appendChild(pool);
+
+  // zones cibles
+  const targets=document.createElement('div');targets.className='dd-targets';
+  (data.targets||[]).forEach(target=>{
+    const row=document.createElement('div');row.className='dd-target';row.dataset.target=target;
+    const tl=document.createElement('span');tl.className='dd-target-label';tl.textContent=target;
+    const slot=document.createElement('div');slot.className='dd-slot';
+    row.appendChild(tl);row.appendChild(slot);
+    row.addEventListener('dragover',e=>{e.preventDefault();row.classList.add('over');});
+    row.addEventListener('dragleave',()=>row.classList.remove('over'));
+    row.addEventListener('drop',e=>{
+      e.preventDefault();row.classList.remove('over');if(!dragged)return;
+      const existing=slot.querySelector('.dd-item');if(existing)pool.appendChild(existing);
+      slot.appendChild(dragged);dragged=null;
     });
-    targetsCol.appendChild(el);
+    targets.appendChild(row);
   });
-  area.appendChild(itemsCol);area.appendChild(targetsCol);wrap.appendChild(area);
+  wrap.appendChild(targets);
+
   let validated=false;
-  const validateBtn=document.createElement('button');validateBtn.className='dd-validate';validateBtn.textContent='Vérifier';
-  validateBtn.onclick=()=>{
-    if(validated)return;validated=true;let allCorrect=true;
-    targetsCol.querySelectorAll('[data-target]').forEach(targetEl=>{
-      const target=targetEl.dataset.target;
-      const placedEl=targetEl.querySelector('[data-placed]');
-      const isCorrect=placedEl&&data.solution[placedEl.dataset.placed]===target;
-      if(!isCorrect)allCorrect=false;
-      targetEl.style.borderStyle='solid';targetEl.style.borderColor=isCorrect?'var(--foret)':'var(--terra)';
-      targetEl.style.background=isCorrect?'var(--foret-light)':'var(--terra-light)';
-      // Colorer l'étiquette placée selon la justesse
-      if(placedEl){placedEl.style.background=isCorrect?'var(--foret-light)':'var(--terra-light)';placedEl.style.borderColor=isCorrect?'var(--foret)':'var(--terra)';placedEl.style.color=isCorrect?'var(--foret)':'var(--terra)';}
+  const btn=document.createElement('button');btn.className='dd-validate';btn.textContent='Vérifier';
+  btn.onclick=()=>{
+    if(validated)return;validated=true;let allOk=true;
+    targets.querySelectorAll('.dd-target').forEach(row=>{
+      const placed=row.querySelector('.dd-item');
+      const ok=placed&&data.solution&&data.solution[placed.dataset.item]===row.dataset.target;
+      if(!ok)allOk=false;
+      row.style.borderStyle='solid';
+      row.style.borderColor=ok?'var(--foret)':'var(--terra)';
+      row.style.background=ok?'var(--foret-light)':'var(--terra-light)';
+      if(placed){placed.style.background=ok?'var(--foret-light)':'var(--terra-light)';placed.style.borderColor=ok?'var(--foret)':'var(--terra)';placed.style.color=ok?'var(--foret)':'var(--terra-dark)';placed.draggable=false;placed.style.cursor='default';}
     });
-    const fb=document.createElement('div');fb.className='art-fb '+(allCorrect?'ok':'ko');
-    fb.textContent=(allCorrect?'✓ Parfait ! ':'✗ Pas tout à fait. ')+data.explanation;wrap.appendChild(fb);
-    setTimeout(()=>{sendAgentSilent('Continuer');},1100);
+    btn.disabled=true;btn.style.opacity='.5';btn.style.pointerEvents='none';
+    const fb=document.createElement('div');fb.className='art-fb '+(allOk?'ok':'ko');
+    fb.textContent=(allOk?'✓ ':'✗ ')+(data.explanation||'');wrap.appendChild(fb);
+    setTimeout(()=>sendAgentSilent(allOk?'Bonne réponse':'Mauvaise réponse'),900);
   };
-  wrap.appendChild(validateBtn);
+  wrap.appendChild(btn);
   addArtifact(wrap);
 }
 
+// ── 5. SCALE (échelle graduée : valeurs / accord / dates) ───────────
 function renderScale(data){
   const wrap=document.createElement('div');wrap.className='art-eval';
-  const lbl=document.createElement('div');lbl.className='art-eval-label';lbl.textContent='Estimation';wrap.appendChild(lbl);
+  const lbl=document.createElement('div');lbl.className='art-eval-label';
+  lbl.textContent=(data.mode==='accord')?'Positionnez-vous':(data.mode==='dates')?'Situez dans le temps':'Estimez';
+  wrap.appendChild(lbl);
   const q=document.createElement('div');q.className='art-eval-q';q.textContent=data.question;wrap.appendChild(q);
-  const labels=document.createElement('div');labels.className='scale-labels';labels.innerHTML=`<span>${data.min_label}</span><span>${data.max_label}</span>`;wrap.appendChild(labels);
-  const btns=document.createElement('div');btns.className='scale-btns';
+
+  const row=document.createElement('div');row.className='sc-row';
+  const opts=data.options||[];
+  const isAccord=(data.mode==='accord'||data.correct===null||data.correct===undefined);
   let answered=false;
-  for(let i=data.min;i<=data.max;i++){
-    const btn=document.createElement('button');btn.className='scale-btn';btn.textContent=i;const val=i;
+  opts.forEach((opt,i)=>{
+    const btn=document.createElement('button');btn.className='sc-btn'+(data.mode==='accord'?' num':'');btn.textContent=opt;
     btn.onclick=()=>{
-      if(answered)return;answered=true;btn.classList.add('sel');
-      setTimeout(()=>{
-        btns.querySelectorAll('.scale-btn').forEach(b=>{b.style.pointerEvents='none';if(parseInt(b.textContent)===data.correct)b.classList.add('correct');else if(b===btn&&val!==data.correct)b.classList.add('wrong');});
-        const fb=document.createElement('div');fb.className='art-fb '+(val===data.correct?'ok':'ko');
-        fb.textContent=(val===data.correct?'✓ ':'✗ ')+data.explanation;wrap.appendChild(fb);
-        setTimeout(()=>{sendAgentSilent('Continuer');},1000);
-      },300);
+      if(answered)return;answered=true;
+      row.querySelectorAll('.sc-btn').forEach((b,j)=>{
+        b.style.pointerEvents='none';
+        if(!isAccord){
+          if(j===data.correct)b.classList.add('correct');
+          else if(j===i)b.classList.add('wrong');
+          else b.classList.add('dim');
+        } else {
+          if(b===btn)b.classList.add('correct'); else b.classList.add('dim');
+        }
+      });
+      if(data.explanation){
+        const ok=isAccord||(i===data.correct);
+        const fb=document.createElement('div');fb.className='art-fb '+(ok?'ok':'ko');
+        fb.textContent=(isAccord?'':(ok?'✓ ':'✗ '))+data.explanation;wrap.appendChild(fb);
+      }
+      const signal=isAccord?'Positionné':((i===data.correct)?'Bonne réponse':'Mauvaise réponse');
+      setTimeout(()=>sendAgentSilent(signal),900);
     };
-    btns.appendChild(btn);
+    row.appendChild(btn);
+  });
+  wrap.appendChild(row);
+  if(data.labels&&data.labels.length===2){
+    const ends=document.createElement('div');ends.className='sc-ends';
+    ends.innerHTML='<span>'+data.labels[0]+'</span><span>'+data.labels[1]+'</span>';
+    wrap.appendChild(ends);
   }
-  wrap.appendChild(btns);
   addArtifact(wrap);
 }
 
@@ -1014,7 +969,7 @@ async function sendPartagerMsg(){
   const tdots=document.createElement('div');tdots.className='typing-dots';tdots.innerHTML='<span></span><span></span><span></span>';
   typingDiv.appendChild(tav);typingDiv.appendChild(tdots);msgs.appendChild(typingDiv);msgs.scrollTop=msgs.scrollHeight;
   try{
-    const res=await fetch(BACKEND_CHAT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'partager',messages:partagerHistory})});
+    const res=await fetch(BACKEND_CLARTEE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'partager',messages:partagerHistory})});
     const data=await res.json();
     const t=document.getElementById('partagerTyping');if(t)t.remove();
     const raw=data.content[0].text.trim();
