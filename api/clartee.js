@@ -109,10 +109,18 @@ function parseScript(raw) {
     if ((m = line.match(/^EVALUER_notion([\d.]+)_(\w+)$/i))) {
       const a = m[2].toUpperCase(); pushMoment({ type: 'EVALUER', notion: m[1], artefact: a, artefactValide: ARTEFACTS.includes(a) }); continue;
     }
-    if ((m = line.match(/^(QUESTION|REPONSE_OK|REPONSE_KO|FEEDBACK_OK|FEEDBACK_KO)\s*=\s*(.+)$/i))) {
+    if ((m = line.match(/^(QUESTION|REPONSE_OK|REPONSE_KO|FEEDBACK_OK|FEEDBACK_KO|PAIRES)\s*=\s*(.+)$/i))) {
       if (current) {
         const key = m[1].toUpperCase();
         if (key === 'REPONSE_KO') current[key] = cleanVal(m[2]).split('|').map(s => cleanVal(s)).filter(Boolean);
+        else if (key === 'PAIRES') {
+          // "Libellé:valeur | Libellé:valeur | ..."
+          current.PAIRES = cleanVal(m[2]).split('|').map(p => {
+            const idx = p.indexOf(':');
+            if (idx === -1) return null;
+            return { label: p.slice(0, idx).trim(), value: p.slice(idx + 1).trim() };
+          }).filter(Boolean);
+        }
         else current[key] = cleanVal(m[2]);
       }
       continue;
@@ -156,6 +164,26 @@ function sourceLabel(kb, code) {
   return s.libelle || code;
 }
 
+// Construit un artefact DRAGDROP déterministe à partir de paires imposées, pour une "partie" donnée.
+// Découpe en groupes de 3. Renvoie { json, totalParts }.
+function buildDragDropPart(pairs, part, srcLabel, groupSize) {
+  const size = groupSize || 3;
+  const totalParts = Math.ceil(pairs.length / size);
+  const slice = pairs.slice(part * size, part * size + size);
+  const items = slice.map(p => p.value);
+  const targets = slice.map(p => p.label);
+  const solution = {};
+  slice.forEach(p => { solution[p.value] = p.label; });
+  const suffix = totalParts > 1 ? ` (partie ${part + 1}/${totalParts})` : '';
+  const json = {
+    type: 'dragdrop',
+    instruction: `Associez chaque quantité d'eau au bon produit, puis validez.${suffix}`,
+    items, targets, solution,
+    explanation: `Ces valeurs sont des moyennes sur la production mondiale, à comparer à une douche de 5 minutes (100 litres). (Source : ${srcLabel})`
+  };
+  return { json, totalParts };
+}
+
 function getMomentInstruction(kb, script, index) {
   const m = script.moments[index];
   if (!m) return null;
@@ -173,12 +201,20 @@ function getMomentInstruction(kb, script, index) {
 
   if (m.type === 'INTRO_SEQUENCE') {
     const titre = kb.sequences[m.sequence] || '';
-    instr += `MOMENT : INTRO_SEQUENCE_${m.sequence}.\nProduis UNE seule phrase de transition annonçant la séquence ${m.sequence} : "${titre}". Court, en texte. Pas d'artefact, pas d'évaluation.`;
+    instr += `MOMENT : INTRO_SEQUENCE_${m.sequence}.\nProduis UNE seule phrase de transition naturelle qui introduit la séquence "${titre}", par exemple "Passons maintenant à : ${titre}." ou "Découvrons à présent ${titre}." Court, chaleureux, en texte simple. N'annonce pas de numéro de séquence. Pas d'artefact, pas d'évaluation, pas d'invitation à appuyer sur un bouton.`;
     return instr;
   }
 
   if (m.type === 'SYNTHESE') {
-    instr += `MOMENT : SYNTHESE (dernier moment du module).\nProduis un court récapitulatif des points clés du module (3-5 puces maximum, en texte markdown). Puis indique sur une dernière ligne, exactement : [[KIT:${kb.media || 'kit.png'}]]\nNe répète pas une conclusion déjà faite. Ne dis pas "Continuer" (c'est la fin). Pas d'artefact JSON.`;
+    // Fournir explicitement les notions réellement vues, pour interdire toute invention
+    const points = kb.notions.map(nn => `- ${nn.texte}`).join('\n');
+    instr += `MOMENT : SYNTHESE (dernier moment du module).\n`;
+    instr += `Voici les notions RÉELLEMENT abordées dans ce module (et UNIQUEMENT celles-ci) :\n${points}\n\n`;
+    instr += `Produis un récapitulatif au format markdown à puces (une puce "- " par point clé, 3 à 5 puces). Chaque puce résume FIDÈLEMENT l'une des notions ci-dessus.\n`;
+    instr += `INTERDICTION ABSOLUE : n'ajoute AUCUNE information, solution, recommandation, cause ou conséquence qui ne figure pas explicitement dans les notions ci-dessus. Pas de "solutions existent", pas de "gestion durable", pas d'"inégalités sociales" si ce n'est pas dans les notions.\n`;
+    instr += `Commence par une courte phrase d'introduction (ex: "Récapitulons les points clés de ce module :"). Puis les puces.\n`;
+    instr += `Termine sur une dernière ligne, exactement : [[KIT:${kb.media || 'kit.png'}]]\n`;
+    instr += `Ne dis pas "Continuer" (c'est la fin). Pas de double conclusion. Pas d'artefact JSON.`;
     return instr;
   }
 
@@ -209,23 +245,26 @@ function getMomentInstruction(kb, script, index) {
     const type = m.artefactValide ? m.artefact : 'QCM';
     instr += `MOMENT : EVALUER notion ${n.id} via l'artefact ${type} (type imposé, ne change pas).\n`;
     instr += `Tu ÉVALUES l'apprenant. Tu produis UNIQUEMENT l'artefact JSON ${type}, rien d'autre.\n\n`;
-    instr += `CONTENU DE RÉFÉRENCE DE LA NOTION (pour construire la question, sans déformer) :\n"${n.texte}"\n\n`;
+    instr += `CONTENU DE RÉFÉRENCE DE LA NOTION (utilise EXACTEMENT ces données, ne les déforme pas, n'en invente aucune autre) :\n"${n.texte}"\n\n`;
+    instr += `Source de la donnée (à citer dans l'explication) : "${srcLabel}"\n`;
     if (m.QUESTION) instr += `QUESTION imposée (utilise-la telle quelle) : "${m.QUESTION}"\n`;
     if (m.REPONSE_OK) instr += `BONNE réponse imposée : "${m.REPONSE_OK}"\n`;
     if (m.REPONSE_KO && m.REPONSE_KO.length) instr += `MAUVAISES réponses imposées : ${JSON.stringify(m.REPONSE_KO)}\n`;
     if (m.FEEDBACK_OK) instr += `Feedback si correct : "${m.FEEDBACK_OK}"\n`;
     if (m.FEEDBACK_KO) instr += `Feedback si incorrect : "${m.FEEDBACK_KO}"\n`;
-    instr += `\n`;
+    instr += `\nRÈGLE D'EXPLICATION : le champ "explanation" reformule clairement la bonne réponse de façon pédagogique, et cite la source à la fin (ex: "... (Source : ${srcLabel})"). N'écris jamais de formule vague comme "selon les données fournies".\n\n`;
     if (type === 'QCM') {
-      instr += `Produis un QCM. Place la bonne réponse et les distracteurs dans "options" (mélangés), "correct" = index de la bonne réponse. "explanation" = le feedback.\n`;
+      instr += `Produis un QCM. Place la bonne réponse et les distracteurs dans "options" (mélangés), "correct" = index de la bonne réponse.\n`;
       instr += `{"type":"qcm","question":"...","options":["A. ...","B. ...","C. ..."],"correct":0,"explanation":"..."}`;
     } else if (type === 'DRAGDROP') {
-      instr += `Produis un DRAGDROP cohérent avec la notion. "items" = étiquettes, "targets" = zones, "solution" = associations correctes.\n`;
-      instr += `{"type":"dragdrop","instruction":"Glissez chaque étiquette sur la bonne zone, puis validez. ...","items":["..."],"targets":["..."],"solution":{"...":"..."},"explanation":"..."}`;
+      instr += `Produis un DRAGDROP qui utilise EXACTEMENT les données de la notion ci-dessus (les vrais éléments et leurs valeurs réelles, JAMAIS des échelles ou fourchettes inventées).\n`;
+      instr += `Chaque zone (target) reçoit UNE seule étiquette (association 1 pour 1). Le nombre d'items doit être ÉGAL au nombre de targets.\n`;
+      instr += `IMPORTANT : si la notion contient plus de 3 éléments à associer, tu n'en prends que 3 pour CE moment (les 3 premiers). Le reste sera traité dans un second temps.\n`;
+      instr += `{"type":"dragdrop","instruction":"Associez chaque élément à sa valeur, puis validez.","items":["..."],"targets":["..."],"solution":{"item":"target"},"explanation":"... (Source : ${srcLabel})"}`;
     } else if (type === 'SCALE') {
-      instr += `Produis un SCALE. "mode" = "valeurs" | "accord" | "dates". "labels" = repères des extrémités. "correct" = index attendu (null en mode accord).\n`;
-      instr += `{"type":"scale","mode":"valeurs","question":"...","options":["..."],"labels":["...","..."],"correct":2,"explanation":"..."}`;
-    } else { // VIGNETTE/TEXTE utilisés en évaluation : on retombe sur QCM par sécurité
+      instr += `Produis un SCALE fidèle à la notion. "mode" = "valeurs" | "accord" | "dates". "labels" = repères des extrémités. "correct" = index attendu (null en mode accord).\n`;
+      instr += `{"type":"scale","mode":"valeurs","question":"...","options":["..."],"labels":["...","..."],"correct":2,"explanation":"... (Source : ${srcLabel})"}`;
+    } else {
       instr += `Produis un QCM.\n{"type":"qcm","question":"...","options":["A. ...","B. ...","C. ..."],"correct":0,"explanation":"..."}`;
     }
     return instr;
@@ -357,13 +396,14 @@ async function handler(req, res) {
   let index = Number.isInteger(body.index) ? body.index : 0;
   const action = body.action || '';
   const isStart = body.start === true || /d[ée]marrer/i.test(action);
+  const isNextPart = /partie suivante/i.test(action);
 
   // Détermine quel moment jouer.
-  // Démarrage => moment 0. Sinon, les actions "réexpliquer"/"savoir plus" restent sur le moment,
-  // toute autre action (Continuer, Bonne réponse, etc.) avance d'un cran.
   let playIndex;
   if (isStart) {
     playIndex = 0;
+  } else if (isNextPart) {
+    playIndex = index; // on reste sur le même moment (dragdrop multi-parties)
   } else {
     playIndex = nextIndex(script, index, action);
   }
@@ -374,10 +414,31 @@ async function handler(req, res) {
     return;
   }
 
+  const moment = script.moments[playIndex];
+
+  // Cas spécial : EVALUER DRAGDROP avec PAIRES imposées => généré par le moteur (déterministe, fidèle KB), découpé en parties.
+  if (moment.type === 'EVALUER' && moment.artefact === 'DRAGDROP' && Array.isArray(moment.PAIRES) && moment.PAIRES.length) {
+    const n = findNotion(kb, moment.notion);
+    const srcLabel = n ? sourceLabel(kb, n.source) : '';
+    const part = Number.isInteger(body.ddPart) ? body.ddPart : 0;
+    const { json, totalParts } = buildDragDropPart(moment.PAIRES, part, srcLabel, 3);
+    res.status(200).json({
+      content: [{ text: JSON.stringify(json) }],
+      index: playIndex,
+      total: script.moments.length,
+      momentType: moment.type,
+      ddPart: part,
+      ddTotalParts: totalParts,
+      hasMorePart: part < totalParts - 1,
+      isLast: playIndex === script.moments.length - 1,
+      done: false
+    });
+    return;
+  }
+
   const messages = buildMomentMessages(kb, script, playIndex, action);
   try {
     const text = await mistralRequest(messages);
-    const moment = script.moments[playIndex];
     res.status(200).json({
       content: [{ text }],
       index: playIndex,

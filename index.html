@@ -224,13 +224,18 @@
 
     /* VIGNETTE */
     .art-vignette{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
-    .vig-media{background:var(--cream);padding:1.1rem;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border);}
-    .vig-media img{max-width:100%;max-height:230px;height:auto;display:block;}
-    .vig-body{padding:1rem 1.25rem;}
+    .vig-row{display:flex;align-items:stretch;}
+    .vig-body{padding:1.1rem 1.25rem;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;}
+    .vig-media{background:var(--cream);padding:1.1rem;display:flex;align-items:center;justify-content:center;flex:0 0 42%;max-width:42%;border-left:1px solid var(--border);}
+    .vig-media img{max-width:100%;max-height:220px;height:auto;display:block;}
     .vig-title{font-family:var(--font-display);font-size:1.15rem;font-weight:400;color:var(--foret);margin-bottom:.5rem;}
     .vig-text{font-size:13px;color:var(--ink-mid);line-height:1.6;}
     .vig-caption{font-size:11px;color:var(--ink-light);font-style:italic;margin-top:.6rem;padding-top:.5rem;border-top:1px solid var(--border);}
     .art-vignette .art-actions{padding:.75rem 1.25rem;border-top:1px solid var(--border);margin-top:0;}
+    @media(max-width:700px){
+      .vig-row{flex-direction:column-reverse;}
+      .vig-media{flex:none;max-width:100%;border-left:none;border-bottom:1px solid var(--border);}
+    }
 
     /* TEXTE */
     .art-texte{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
@@ -579,6 +584,8 @@ let partagerHistory=[];
 let agentTyping=false,partagerTyping=false;
 let currentCode='';
 let currentIndex=0;       // index du moment courant déjà joué
+let currentDdPart=0;      // partie courante d'un dragdrop multi-parties
+let ddHasMore=false;      // reste-t-il une partie de dragdrop à jouer
 let draggedItem=null;
 
 async function doLogin(){
@@ -683,15 +690,22 @@ async function playMoment(action, start){
   try{
     const payload={code:currentCode,index:currentIndex,action:action||''};
     if(start) payload.start=true;
+    // dragdrop multi-parties : si on demande la partie suivante, on incrémente
+    if(/partie suivante/i.test(action||'')){ payload.ddPart=currentDdPart+1; }
+    else if(!start){ payload.ddPart=0; }
     const res=await fetch(BACKEND_CLARTEE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const data=await res.json();hideTyping();
-    // Libérer l'état AVANT d'afficher la réponse et ses boutons (évite tout blocage du clic suivant)
     agentTyping=false;updateAgentSend();
     if(data.error){ addMsg('agent','Erreur : '+data.error); return; }
     if(data.done){ return; }
     if(typeof data.index==='number') currentIndex=data.index;
+    // état dragdrop multi-parties
+    if(typeof data.ddPart==='number') currentDdPart=data.ddPart; else currentDdPart=0;
+    ddHasMore=!!data.hasMorePart;
+    const isSeqTransition=(data.momentType==='INTRO_SEQUENCE');
     const raw=(data.content&&data.content[0]&&data.content[0].text||'').trim();
-    handleResponse(raw);
+    handleResponse(raw, isSeqTransition);
+    if(isSeqTransition){ setTimeout(()=>playMoment('Continuer'), 900); }
   }catch(err){hideTyping();agentTyping=false;updateAgentSend();addMsg('agent','Erreur : '+err.message);}
 }
 
@@ -715,7 +729,7 @@ function sendAgentSilent(signal){ playMoment(signal); }
 
 function resolveMedia(name){ return name ? (MEDIA_BASE + name) : null; }
 
-function handleResponse(raw){
+function handleResponse(raw, autoNext){
   // Marqueur KIT de la SYNTHESE : [[KIT:fichier.png]]
   const kitMatch=raw.match(/\[\[KIT:([^\]]+)\]\]/);
   if(kitMatch){
@@ -733,7 +747,7 @@ function handleResponse(raw){
 
   if(!parsed||!parsed.type){
     addMsg('agent',raw);
-    afterTextMessage(raw);
+    if(!autoNext) afterTextMessage(raw);
     return;
   }
 
@@ -829,12 +843,8 @@ function renderQCM(data){
 // ── 2. VIGNETTE (transmission avec média) ───────────────────────────
 function renderVignette(data){
   const card=document.createElement('div');card.className='art-vignette';
-  if(data.media){
-    const mediaWrap=document.createElement('div');mediaWrap.className='vig-media';
-    const img=document.createElement('img');img.src=resolveMedia(data.media);img.alt=data.caption||data.title||'';
-    img.onerror=()=>{mediaWrap.style.display='none';};
-    mediaWrap.appendChild(img);card.appendChild(mediaWrap);
-  }
+  const row=document.createElement('div');row.className='vig-row';
+
   const body=document.createElement('div');body.className='vig-body';
   if(data.title){const t=document.createElement('div');t.className='vig-title';t.textContent=data.title;body.appendChild(t);}
   if(data.text){const p=document.createElement('div');p.className='vig-text';p.textContent=data.text;body.appendChild(p);}
@@ -843,7 +853,16 @@ function renderVignette(data){
     c.textContent=(data.caption||'')+(data.source?' · Source : '+data.source:'');
     body.appendChild(c);
   }
-  card.appendChild(body);
+  row.appendChild(body); // texte à gauche
+
+  if(data.media){
+    const mediaWrap=document.createElement('div');mediaWrap.className='vig-media';
+    const img=document.createElement('img');img.src=resolveMedia(data.media);img.alt=data.caption||data.title||'';
+    img.onerror=()=>{mediaWrap.style.display='none';};
+    mediaWrap.appendChild(img);row.appendChild(mediaWrap); // image à droite
+  }
+
+  card.appendChild(row);
   card.appendChild(transmitActions(!!data.more));
   addArtifact(card);
 }
@@ -916,7 +935,7 @@ function renderDragDrop(data){
     btn.disabled=true;btn.style.opacity='.5';btn.style.pointerEvents='none';
     const fb=document.createElement('div');fb.className='art-fb '+(allOk?'ok':'ko');
     fb.textContent=(allOk?'✓ ':'✗ ')+(data.explanation||'');wrap.appendChild(fb);
-    setTimeout(()=>setQR(['Continuer']),700);
+    setTimeout(()=>{ ddHasMore ? setQR(['Partie suivante']) : setQR(['Continuer']); },700);
   };
   wrap.appendChild(btn);
   addArtifact(wrap);
