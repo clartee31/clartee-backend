@@ -164,9 +164,23 @@ function sourceLabel(kb, code) {
   return s.libelle || code;
 }
 
+// Renvoie { label, url } propres pour une source : libellé nettoyé du markdown, URL séparée.
+function sourceInfo(kb, code) {
+  const s = kb.sources[code];
+  if (!s) return { label: code, url: null };
+  let label = s.libelle || code;
+  // Retirer les liens markdown [texte](url) en gardant le texte
+  label = label.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
+  // Retirer les URLs nues résiduelles
+  label = label.replace(/https?:\/\/[^\s)]+/g, '').replace(/\s{2,}/g, ' ').replace(/[\s,.]+$/, '').trim();
+  // Retirer astérisques markdown et guillemets typographiques superflus en bord
+  label = label.replace(/\*+/g, '').replace(/^["“”']+|["“”']+$/g, '').replace(/[\s,.*]+$/, '').trim();
+  return { label, url: s.url || null };
+}
+
 // Construit un artefact DRAGDROP déterministe à partir de paires imposées, pour une "partie" donnée.
 // Découpe en groupes de 3. Renvoie { json, totalParts }.
-function buildDragDropPart(pairs, part, srcLabel, groupSize) {
+function buildDragDropPart(pairs, part, src, groupSize) {
   const size = groupSize || 3;
   const totalParts = Math.ceil(pairs.length / size);
   const slice = pairs.slice(part * size, part * size + size);
@@ -179,7 +193,9 @@ function buildDragDropPart(pairs, part, srcLabel, groupSize) {
     type: 'dragdrop',
     instruction: `Associez chaque quantité d'eau au bon produit, puis validez.${suffix}`,
     items, targets, solution,
-    explanation: `Ces valeurs sont des moyennes sur la production mondiale, à comparer à une douche de 5 minutes (100 litres). (Source : ${srcLabel})`
+    explanation: `Ces valeurs sont des moyennes sur la production mondiale, à comparer à une douche de 5 minutes (100 litres).`,
+    source: src && src.label ? src.label : '',
+    sourceUrl: src && src.url ? src.url : ''
   };
   return { json, totalParts };
 }
@@ -222,7 +238,9 @@ function getMomentInstruction(kb, script, index) {
   const n = findNotion(kb, m.notion);
   if (!n) { instr += `MOMENT : ${m.type} notion ${m.notion} (notion introuvable, produis un court texte d'erreur neutre).`; return instr; }
 
-  const srcLabel = sourceLabel(kb, n.source);
+  const src = sourceInfo(kb, n.source);
+  const srcLabel = src.label;
+  const srcUrl = src.url || '';
   const hasP2 = !!n.complement;
 
   if (m.type === 'TRANSMETTRE') {
@@ -230,13 +248,13 @@ function getMomentInstruction(kb, script, index) {
     instr += `MOMENT : TRANSMETTRE notion ${n.id} via l'artefact ${type} (type imposé, ne change pas).\n`;
     instr += `Tu PRÉSENTES la notion sans l'évaluer. Tu produis UNIQUEMENT l'artefact JSON ${type} ci-dessous, rien d'autre.\n\n`;
     instr += `CONTENU EXACT DE LA NOTION (à ne pas déformer, reprends fidèlement les chiffres et le sens) :\n"${n.texte}"\n\n`;
-    instr += `Source à afficher en clair (champ "source") : "${srcLabel}"\n`;
+    instr += `Source (champ "source" = libellé, champ "sourceUrl" = lien, à recopier tels quels) : "${srcLabel}" / "${srcUrl}"\n`;
     if (type === 'VIGNETTE') {
       instr += `Média à afficher (champ "media") : "${n.media || ''}"\n`;
       instr += `Légende (champ "caption") : "${n.mediaLegende || ''}"\n`;
-      instr += `\nProduis : {"type":"vignette","title":"<titre court de la notion>","text":"<le contenu de la notion, fidèle, reformulé de façon claire mais SANS changer les chiffres ni le sens>","media":"${n.media || ''}","caption":"${n.mediaLegende || ''}","source":"${srcLabel}","more":${hasP2}}`;
+      instr += `\nProduis : {"type":"vignette","title":"<titre court de la notion>","text":"<le contenu de la notion, fidèle, reformulé clairement mais SANS changer les chiffres ni le sens>","media":"${n.media || ''}","caption":"${n.mediaLegende || ''}","source":"${srcLabel}","sourceUrl":"${srcUrl}","more":${hasP2}}`;
     } else {
-      instr += `\nProduis : {"type":"texte","title":"<titre court de la notion>","text":"<le contenu de la notion, fidèle, SANS changer les chiffres ni le sens>","source":"${srcLabel}","more":${hasP2}}`;
+      instr += `\nProduis : {"type":"texte","title":"<titre court de la notion>","text":"<le contenu de la notion, fidèle, SANS changer les chiffres ni le sens>","source":"${srcLabel}","sourceUrl":"${srcUrl}","more":${hasP2}}`;
     }
     return instr;
   }
@@ -246,26 +264,25 @@ function getMomentInstruction(kb, script, index) {
     instr += `MOMENT : EVALUER notion ${n.id} via l'artefact ${type} (type imposé, ne change pas).\n`;
     instr += `Tu ÉVALUES l'apprenant. Tu produis UNIQUEMENT l'artefact JSON ${type}, rien d'autre.\n\n`;
     instr += `CONTENU DE RÉFÉRENCE DE LA NOTION (utilise EXACTEMENT ces données, ne les déforme pas, n'en invente aucune autre) :\n"${n.texte}"\n\n`;
-    instr += `Source de la donnée (à citer dans l'explication) : "${srcLabel}"\n`;
     if (m.QUESTION) instr += `QUESTION imposée (utilise-la telle quelle) : "${m.QUESTION}"\n`;
     if (m.REPONSE_OK) instr += `BONNE réponse imposée : "${m.REPONSE_OK}"\n`;
     if (m.REPONSE_KO && m.REPONSE_KO.length) instr += `MAUVAISES réponses imposées : ${JSON.stringify(m.REPONSE_KO)}\n`;
     if (m.FEEDBACK_OK) instr += `Feedback si correct : "${m.FEEDBACK_OK}"\n`;
     if (m.FEEDBACK_KO) instr += `Feedback si incorrect : "${m.FEEDBACK_KO}"\n`;
-    instr += `\nRÈGLE D'EXPLICATION : le champ "explanation" reformule clairement la bonne réponse de façon pédagogique, et cite la source à la fin (ex: "... (Source : ${srcLabel})"). N'écris jamais de formule vague comme "selon les données fournies".\n\n`;
+    instr += `\nRÈGLE D'EXPLICATION : le champ "explanation" reformule clairement la bonne réponse de façon pédagogique, en UNE à DEUX phrases. NE CITE PAS la source dans "explanation" (elle est affichée à part via "source"/"sourceUrl"). N'écris jamais de formule vague comme "selon les données fournies".\n`;
+    instr += `Source (champ "source" = libellé, champ "sourceUrl" = lien) : "${srcLabel}" / "${srcUrl}"\n\n`;
     if (type === 'QCM') {
       instr += `Produis un QCM. Place la bonne réponse et les distracteurs dans "options" (mélangés), "correct" = index de la bonne réponse.\n`;
-      instr += `{"type":"qcm","question":"...","options":["A. ...","B. ...","C. ..."],"correct":0,"explanation":"..."}`;
+      instr += `{"type":"qcm","question":"...","options":["A. ...","B. ...","C. ..."],"correct":0,"explanation":"...","source":"${srcLabel}","sourceUrl":"${srcUrl}"}`;
     } else if (type === 'DRAGDROP') {
-      instr += `Produis un DRAGDROP qui utilise EXACTEMENT les données de la notion ci-dessus (les vrais éléments et leurs valeurs réelles, JAMAIS des échelles ou fourchettes inventées).\n`;
-      instr += `Chaque zone (target) reçoit UNE seule étiquette (association 1 pour 1). Le nombre d'items doit être ÉGAL au nombre de targets.\n`;
-      instr += `IMPORTANT : si la notion contient plus de 3 éléments à associer, tu n'en prends que 3 pour CE moment (les 3 premiers). Le reste sera traité dans un second temps.\n`;
-      instr += `{"type":"dragdrop","instruction":"Associez chaque élément à sa valeur, puis validez.","items":["..."],"targets":["..."],"solution":{"item":"target"},"explanation":"... (Source : ${srcLabel})"}`;
+      instr += `Produis un DRAGDROP qui utilise EXACTEMENT les données de la notion ci-dessus (les vrais éléments et leurs valeurs réelles, JAMAIS des échelles inventées).\n`;
+      instr += `Chaque zone (target) reçoit UNE seule étiquette. Le nombre d'items = nombre de targets. Si plus de 3 éléments, n'en prends que 3.\n`;
+      instr += `{"type":"dragdrop","instruction":"Associez chaque élément à sa valeur, puis validez.","items":["..."],"targets":["..."],"solution":{"item":"target"},"explanation":"...","source":"${srcLabel}","sourceUrl":"${srcUrl}"}`;
     } else if (type === 'SCALE') {
       instr += `Produis un SCALE fidèle à la notion. "mode" = "valeurs" | "accord" | "dates". "labels" = repères des extrémités. "correct" = index attendu (null en mode accord).\n`;
-      instr += `{"type":"scale","mode":"valeurs","question":"...","options":["..."],"labels":["...","..."],"correct":2,"explanation":"... (Source : ${srcLabel})"}`;
+      instr += `{"type":"scale","mode":"valeurs","question":"...","options":["..."],"labels":["...","..."],"correct":2,"explanation":"...","source":"${srcLabel}","sourceUrl":"${srcUrl}"}`;
     } else {
-      instr += `Produis un QCM.\n{"type":"qcm","question":"...","options":["A. ...","B. ...","C. ..."],"correct":0,"explanation":"..."}`;
+      instr += `Produis un QCM.\n{"type":"qcm","question":"...","options":["A. ...","B. ...","C. ..."],"correct":0,"explanation":"...","source":"${srcLabel}","sourceUrl":"${srcUrl}"}`;
     }
     return instr;
   }
@@ -290,10 +307,10 @@ function buildMomentMessages(kb, script, index, action) {
 }
 
 // Détermine le prochain index selon le moment courant et l'action de l'apprenant.
-// Les actions "Me réexpliquer" et "En savoir plus" NE font PAS avancer (on reste sur le moment).
+// L'action "En savoir plus" NE fait PAS avancer (on reste sur le moment pour montrer le complément P2).
 function nextIndex(script, index, action) {
   const a = (action || '').toLowerCase();
-  if (a.includes('réexpli') || a.includes('reexpli') || a.includes('savoir plus')) return index; // reste
+  if (a.includes('savoir plus')) return index; // reste sur le moment (affiche le complément P2)
   return Math.min(index + 1, script.moments.length); // avance (peut dépasser = fin)
 }
 
@@ -419,9 +436,9 @@ async function handler(req, res) {
   // Cas spécial : EVALUER DRAGDROP avec PAIRES imposées => généré par le moteur (déterministe, fidèle KB), découpé en parties.
   if (moment.type === 'EVALUER' && moment.artefact === 'DRAGDROP' && Array.isArray(moment.PAIRES) && moment.PAIRES.length) {
     const n = findNotion(kb, moment.notion);
-    const srcLabel = n ? sourceLabel(kb, n.source) : '';
+    const src = n ? sourceInfo(kb, n.source) : { label: '', url: '' };
     const part = Number.isInteger(body.ddPart) ? body.ddPart : 0;
-    const { json, totalParts } = buildDragDropPart(moment.PAIRES, part, srcLabel, 3);
+    const { json, totalParts } = buildDragDropPart(moment.PAIRES, part, src, 3);
     res.status(200).json({
       content: [{ text: JSON.stringify(json) }],
       index: playIndex,

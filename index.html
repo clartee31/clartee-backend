@@ -210,6 +210,9 @@
     .art-fb{font-size:12.5px;margin-top:9px;padding:8px 12px;border-radius:8px;line-height:1.5;}
     .art-fb.ok{background:var(--foret-light);color:var(--foret);}
     .art-fb.ko{background:var(--terra-light);color:var(--terra);}
+    .art-source{margin-top:6px;font-size:11px;color:var(--ink-light);}
+    .art-source a{color:var(--ink-mid);text-decoration:underline;text-underline-offset:2px;}
+    .art-source a:hover{color:var(--terra);}
 
     /* ARTEFACTS CLARTÉE VALIDÉS */
     .art-wrap{max-width:92%;width:100%;}
@@ -464,7 +467,7 @@
           <div class="chat-head"><div class="chat-av">✦</div><div><div class="chat-agent-name">Clartée</div><div class="chat-agent-status"><span class="sdot"></span>En ligne</div></div></div>
           <div class="chat-msgs" id="agentMsgs"></div>
           <div class="quick-replies" id="agentQR"></div>
-          <div class="chat-input-row">
+          <div class="chat-input-row" id="agentInputRow">
             <textarea class="chat-textarea" id="agentInput" placeholder="Votre réponse..." rows="1" onkeydown="handleAgentKey(event)" oninput="updateAgentSend()"></textarea>
             <button class="send-btn" id="agentSend" onclick="sendAgent()" disabled><i class="ti ti-send"></i></button>
           </div>
@@ -645,6 +648,8 @@ function openModule(code,titre){
   document.getElementById('agentMsgs').innerHTML='';
   document.getElementById('agentQR').innerHTML='';
   goPage('agent');
+  // Saisie clavier désactivée pendant le parcours : seuls les boutons pilotent.
+  const inputRow=document.getElementById('agentInputRow'); if(inputRow) inputRow.style.display='none';
   // Lance le moment 0 (INTRO_MODULE) avec le flag de démarrage explicite.
   setTimeout(()=>{ playMoment('Démarrer', true); },200);
 }
@@ -761,17 +766,19 @@ function handleResponse(raw, autoNext){
   }
 }
 
-// Affiche le KIT du module en image téléchargeable (fin de module)
+// Affiche le KIT du module en image téléchargeable (fin de module), deux colonnes
 function renderKit(file){
   const card=document.createElement('div');card.className='art-vignette';
+  const row=document.createElement('div');row.className='vig-row';
+  const body=document.createElement('div');body.className='vig-body';
+  body.innerHTML='<div class="vig-title">Votre kit récapitulatif</div><div class="vig-text">Cliquez sur l\'image pour télécharger le kit du module.</div>';
+  row.appendChild(body);
   const mediaWrap=document.createElement('div');mediaWrap.className='vig-media';
   const a=document.createElement('a');a.href=resolveMedia(file);a.download=file;a.title='Télécharger le kit';
   const img=document.createElement('img');img.src=resolveMedia(file);img.alt='Kit du module';
   img.onerror=()=>{mediaWrap.innerHTML='<div style="font-size:12px;color:var(--ink-light);padding:1rem;">Kit indisponible</div>';};
-  a.appendChild(img);mediaWrap.appendChild(a);card.appendChild(mediaWrap);
-  const body=document.createElement('div');body.className='vig-body';
-  body.innerHTML='<div class="vig-title">Votre kit récapitulatif</div><div class="vig-text">Cliquez sur l\'image pour télécharger le kit du module.</div>';
-  card.appendChild(body);
+  a.appendChild(img);mediaWrap.appendChild(a);row.appendChild(mediaWrap);
+  card.appendChild(row);
   addArtifact(card);
   document.getElementById('agentQR').innerHTML='';
 }
@@ -784,6 +791,20 @@ function afterTextMessage(text){
   setQR(['Continuer']);
 }
 
+// Crée un lien source discret (titre cliquable, URL cachée, nouvel onglet). Renvoie null si pas de source.
+function sourceLink(data){
+  if(!data||!data.source) return null;
+  const wrap=document.createElement('div');wrap.className='art-source';
+  if(data.sourceUrl){
+    const a=document.createElement('a');a.href=data.sourceUrl;a.target='_blank';a.rel='noopener noreferrer';
+    a.textContent='Source : '+data.source;
+    wrap.appendChild(a);
+  } else {
+    wrap.textContent='Source : '+data.source;
+  }
+  return wrap;
+}
+
 // Conteneur d'artefact aligné côté agent
 function addArtifact(el){
   const msgs=document.getElementById('agentMsgs');
@@ -793,14 +814,12 @@ function addArtifact(el){
   div.appendChild(av);div.appendChild(wrap);msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
 }
 
-// Barre de boutons de transmission : Continuer / Me réexpliquer / (En savoir plus)
+// Barre de boutons de transmission : Continuer / (En savoir plus)
 function transmitActions(more){
   const row=document.createElement('div');row.className='art-actions';
   const bOk=document.createElement('button');bOk.className='btn-ok';bOk.textContent='Continuer →';
   bOk.onclick=()=>{disableRow(row);sendAgentSilent('Continuer');};
-  const bAlt=document.createElement('button');bAlt.className='btn-alt';bAlt.textContent='Me réexpliquer';
-  bAlt.onclick=()=>{disableRow(row);sendAgentSilent('Me réexpliquer');};
-  row.appendChild(bOk);row.appendChild(bAlt);
+  row.appendChild(bOk);
   if(more){
     const bMore=document.createElement('button');bMore.className='btn-more';bMore.textContent='En savoir plus';
     bMore.onclick=()=>{disableRow(row);sendAgentSilent('En savoir plus');};
@@ -832,6 +851,7 @@ function renderQCM(data){
       const ok=(i===data.correct);
       const fb=document.createElement('div');fb.className='art-fb '+(ok?'ok':'ko');
       fb.textContent=(ok?'✓ ':'✗ ')+(data.explanation||'');wrap.appendChild(fb);
+      const sl=sourceLink(data);if(sl)wrap.appendChild(sl);
       // L'agent reformule la notion puis propose Continuer/Me réexpliquer (géré côté script)
       setTimeout(()=>setQR(['Continuer']),700);
     };
@@ -850,7 +870,20 @@ function renderVignette(data){
   if(data.text){const p=document.createElement('div');p.className='vig-text';p.textContent=data.text;body.appendChild(p);}
   if(data.caption||data.source){
     const c=document.createElement('div');c.className='vig-caption';
-    c.textContent=(data.caption||'')+(data.source?' · Source : '+data.source:'');
+    let txt=(data.caption||'');
+    if(data.source){
+      if(txt) txt+=' · ';
+      if(data.sourceUrl){
+        c.textContent=txt+'Source : ';
+        const a=document.createElement('a');a.href=data.sourceUrl;a.target='_blank';a.rel='noopener noreferrer';a.textContent=data.source;
+        a.style.color='var(--ink-mid)';a.style.textDecoration='underline';
+        c.appendChild(a);
+      } else {
+        c.textContent=txt+'Source : '+data.source;
+      }
+    } else {
+      c.textContent=txt;
+    }
     body.appendChild(c);
   }
   row.appendChild(body); // texte à gauche
@@ -873,7 +906,16 @@ function renderTexte(data){
   const body=document.createElement('div');body.className='txt-body';
   if(data.title){const t=document.createElement('div');t.className='txt-title';t.textContent=data.title;body.appendChild(t);}
   if(data.text){const p=document.createElement('div');p.className='txt-para';p.textContent=data.text;body.appendChild(p);}
-  if(data.source){const c=document.createElement('div');c.className='txt-caption';c.textContent='Source : '+data.source;body.appendChild(c);}
+  if(data.source){
+    const c=document.createElement('div');c.className='txt-caption';
+    if(data.sourceUrl){
+      c.textContent='Source : ';
+      const a=document.createElement('a');a.href=data.sourceUrl;a.target='_blank';a.rel='noopener noreferrer';a.textContent=data.source;
+      a.style.color='var(--ink-mid)';a.style.textDecoration='underline';
+      c.appendChild(a);
+    } else { c.textContent='Source : '+data.source; }
+    body.appendChild(c);
+  }
   card.appendChild(body);
   card.appendChild(transmitActions(!!data.more));
   addArtifact(card);
@@ -901,9 +943,10 @@ function renderDragDrop(data){
   pool.addEventListener('drop',e=>{e.preventDefault();if(dragged){pool.appendChild(dragged);dragged=null;}});
   wrap.appendChild(pool);
 
-  // zones cibles
+  // zones cibles (ordre mélangé pour ne pas aligner zone et bonne réponse)
   const targets=document.createElement('div');targets.className='dd-targets';
-  (data.targets||[]).forEach(target=>{
+  const shuffledTargets=[...(data.targets||[])].sort(()=>Math.random()-0.5);
+  shuffledTargets.forEach(target=>{
     const row=document.createElement('div');row.className='dd-target';row.dataset.target=target;
     const tl=document.createElement('span');tl.className='dd-target-label';tl.textContent=target;
     const slot=document.createElement('div');slot.className='dd-slot';
@@ -935,6 +978,7 @@ function renderDragDrop(data){
     btn.disabled=true;btn.style.opacity='.5';btn.style.pointerEvents='none';
     const fb=document.createElement('div');fb.className='art-fb '+(allOk?'ok':'ko');
     fb.textContent=(allOk?'✓ ':'✗ ')+(data.explanation||'');wrap.appendChild(fb);
+    const sl=sourceLink(data);if(sl)wrap.appendChild(sl);
     setTimeout(()=>{ ddHasMore ? setQR(['Partie suivante']) : setQR(['Continuer']); },700);
   };
   wrap.appendChild(btn);
@@ -971,6 +1015,7 @@ function renderScale(data){
         const ok=isAccord||(i===data.correct);
         const fb=document.createElement('div');fb.className='art-fb '+(ok?'ok':'ko');
         fb.textContent=(isAccord?'':(ok?'✓ ':'✗ '))+data.explanation;wrap.appendChild(fb);
+        const sl=sourceLink(data);if(sl)wrap.appendChild(sl);
       }
       setTimeout(()=>setQR(['Continuer']),700);
     };
