@@ -35,7 +35,7 @@ Média = k11-media21.png (légende : Population affectée par le stress hydrique
 Élément complémentaire (Source S03)   
 On estime que 10 % de la hausse des flux migratoires sur la planète ont été liés à des déficits hydriques entre 1970 et 2000   
    
-***Notion 2.2 (Source S07)  
+***Notion 2.2 (Source S04)  
 Dans le monde, 1 personne sur 4 (soit 2,1 milliards de personnes) n’a toujours pas accès à une eau potable saine. 
    
 Élément complémentaire (Source S04)   
