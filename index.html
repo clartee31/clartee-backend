@@ -124,6 +124,8 @@
     .bubble.agent{background:var(--cream);border-radius:4px 14px 14px 14px;}
     .bubble.user{background:var(--terra);color:white;border-radius:14px 4px 14px 14px;}
     .bubble p{margin-bottom:.35em;}.bubble p:last-child{margin-bottom:0;}
+    .bubble ol,.bubble ul{margin:.4em 0;padding-left:1.6em;}
+    .bubble li{margin-bottom:.25em;padding-left:.2em;}
     .typing-dots{display:flex;gap:4px;align-items:center;padding:10px 14px;background:var(--cream);border-radius:4px 14px 14px 14px;width:fit-content;}
     .typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--ink-light);animation:bounce 1.2s infinite;}
     .typing-dots span:nth-child(2){animation-delay:.2s;}
@@ -683,13 +685,14 @@ async function playMoment(action, start){
     if(start) payload.start=true;
     const res=await fetch(BACKEND_CLARTEE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const data=await res.json();hideTyping();
-    if(data.error){ addMsg('agent','Erreur : '+data.error); agentTyping=false;updateAgentSend(); return; }
-    if(data.done){ agentTyping=false;updateAgentSend(); return; }
+    // Libérer l'état AVANT d'afficher la réponse et ses boutons (évite tout blocage du clic suivant)
+    agentTyping=false;updateAgentSend();
+    if(data.error){ addMsg('agent','Erreur : '+data.error); return; }
+    if(data.done){ return; }
     if(typeof data.index==='number') currentIndex=data.index;
     const raw=(data.content&&data.content[0]&&data.content[0].text||'').trim();
     handleResponse(raw);
-  }catch(err){hideTyping();addMsg('agent','Erreur : '+err.message);}
-  agentTyping=false;updateAgentSend();
+  }catch(err){hideTyping();agentTyping=false;updateAgentSend();addMsg('agent','Erreur : '+err.message);}
 }
 
 // Saisie libre de l'apprenant (utile dans le dialogue « Me réexpliquer ») : affiche la bulle, ne fait pas avancer.
