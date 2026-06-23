@@ -964,6 +964,30 @@ function renderDragDrop(data){
 
   let validated=false;
   const btn=document.createElement('button');btn.className='dd-validate';btn.textContent='Vérifier';
+
+  // Replace chaque étiquette dans sa bonne zone, en vert (la correction)
+  function showCorrection(){
+    // index des zones par leur libellé
+    const rows=Array.from(targets.querySelectorAll('.dd-target'));
+    const byTarget={};rows.forEach(r=>{byTarget[r.dataset.target]=r;});
+    // pour chaque association correcte item->target, déplacer l'étiquette
+    Object.keys(data.solution||{}).forEach(item=>{
+      const target=data.solution[item];
+      const row=byTarget[target];if(!row)return;
+      const slot=row.querySelector('.dd-slot');
+      // retrouver l'étiquette où qu'elle soit (parcours direct, sans sélecteur CSS)
+      let el=Array.from(wrap.querySelectorAll('.dd-item')).find(x=>x.dataset.item===item);
+      if(!el){ // recréer si introuvable
+        el=document.createElement('div');el.className='dd-item';el.textContent=item;el.dataset.item=item;
+      }
+      const existing=slot.querySelector('.dd-item');if(existing&&existing!==el){pool.appendChild(existing);}
+      slot.appendChild(el);
+      el.draggable=false;el.style.cursor='default';
+      el.style.background='var(--foret-light)';el.style.borderColor='var(--foret)';el.style.color='var(--foret)';
+      row.style.borderStyle='solid';row.style.borderColor='var(--foret)';row.style.background='var(--foret-light)';
+    });
+  }
+
   btn.onclick=()=>{
     if(validated)return;validated=true;let allOk=true;
     targets.querySelectorAll('.dd-target').forEach(row=>{
@@ -979,7 +1003,15 @@ function renderDragDrop(data){
     const fb=document.createElement('div');fb.className='art-fb '+(allOk?'ok':'ko');
     fb.textContent=(allOk?'✓ ':'✗ ')+(data.explanation||'');wrap.appendChild(fb);
     const sl=sourceLink(data);if(sl)wrap.appendChild(sl);
-    setTimeout(()=>{ ddHasMore ? setQR(['Partie suivante']) : setQR(['Continuer']); },700);
+    if(!allOk){
+      // bouton de correction : replace les étiquettes au bon endroit
+      const corrBtn=document.createElement('button');corrBtn.className='dd-validate';corrBtn.style.marginTop='8px';corrBtn.style.background='var(--foret)';corrBtn.textContent='Voir la correction';
+      corrBtn.onclick=()=>{ showCorrection(); corrBtn.disabled=true;corrBtn.style.opacity='.5';corrBtn.style.pointerEvents='none';
+        setTimeout(()=>{ ddHasMore ? setQR(['Partie suivante']) : setQR(['Continuer']); },500); };
+      wrap.appendChild(corrBtn);
+    } else {
+      setTimeout(()=>{ ddHasMore ? setQR(['Partie suivante']) : setQR(['Continuer']); },700);
+    }
   };
   wrap.appendChild(btn);
   addArtifact(wrap);

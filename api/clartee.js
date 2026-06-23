@@ -200,7 +200,7 @@ function buildDragDropPart(pairs, part, src, groupSize) {
   return { json, totalParts };
 }
 
-function getMomentInstruction(kb, script, index) {
+function getMomentInstruction(kb, script, index, action) {
   const m = script.moments[index];
   if (!m) return null;
   const total = script.moments.length;
@@ -210,8 +210,14 @@ function getMomentInstruction(kb, script, index) {
   let instr = `Tu joues UNIQUEMENT le moment ${index + 1} sur ${total} du module "${kb.titre}" (${kb.module}). Tu ne joues PAS les autres moments. Tu produis exactement UN message (texte OU un seul artefact JSON), puis tu t'arrêtes.\n\n`;
 
   if (m.type === 'INTRO_MODULE') {
-    const seqList = Object.entries(kb.sequences).map(([n, t]) => `${n}) ${t}`).join(', ');
-    instr += `MOMENT : INTRO_MODULE.\nProduis un court message texte (2-3 phrases) d'accueil qui présente le sujet du module "${kb.titre}" et annonce les ${Object.keys(kb.sequences).length} séquences : ${seqList}. Termine en invitant à appuyer sur « Continuer ». N'évalue rien. Pas d'artefact JSON, juste du texte.`;
+    const seqLines = Object.entries(kb.sequences).map(([n, t]) => `${n}. ${t}`).join('\n');
+    instr += `MOMENT : INTRO_MODULE.\n`;
+    instr += `Produis un message texte d'accueil ainsi structuré (et UNIQUEMENT du texte, pas d'artefact JSON) :\n`;
+    instr += `1) Une ou deux phrases d'accroche présentant le sujet du module "${kb.titre}".\n`;
+    instr += `2) La phrase "Ce module se compose de ${Object.keys(kb.sequences).length} séquences :"\n`;
+    instr += `3) La liste numérotée EXACTE des séquences, chacune sur sa propre ligne, recopiée telle quelle :\n${seqLines}\n`;
+    instr += `4) Une dernière ligne invitant à appuyer sur « Continuer ».\n`;
+    instr += `IMPORTANT : conserve la liste numérotée visible (1., 2., 3.), ne la fonds pas dans une phrase. N'évalue rien.`;
     return instr;
   }
 
@@ -245,10 +251,23 @@ function getMomentInstruction(kb, script, index) {
 
   if (m.type === 'TRANSMETTRE') {
     const type = m.artefactValide ? m.artefact : 'TEXTE';
+    const wantsMore = /savoir plus/i.test(action || '');
+
+    // Cas "En savoir plus" : on affiche le complément P2 dans un TEXTE, puis seulement "Continuer".
+    if (wantsMore && hasP2) {
+      const cSrc = sourceInfo(kb, n.complementSource || n.source);
+      instr += `MOMENT : approfondissement de la notion ${n.id} (élément complémentaire).\n`;
+      instr += `Tu produis UNIQUEMENT un artefact JSON TEXTE présentant cet élément complémentaire, fidèlement, sans le déformer :\n"${n.complement}"\n\n`;
+      instr += `Le champ "more" doit être false (pas d'autre approfondissement).\n`;
+      instr += `Produis : {"type":"texte","title":"Pour aller plus loin","text":"<le complément, fidèle>","source":"${cSrc.label}","sourceUrl":"${cSrc.url || ''}","more":false}`;
+      return instr;
+    }
+
     instr += `MOMENT : TRANSMETTRE notion ${n.id} via l'artefact ${type} (type imposé, ne change pas).\n`;
     instr += `Tu PRÉSENTES la notion sans l'évaluer. Tu produis UNIQUEMENT l'artefact JSON ${type} ci-dessous, rien d'autre.\n\n`;
     instr += `CONTENU EXACT DE LA NOTION (à ne pas déformer, reprends fidèlement les chiffres et le sens) :\n"${n.texte}"\n\n`;
     instr += `Source (champ "source" = libellé, champ "sourceUrl" = lien, à recopier tels quels) : "${srcLabel}" / "${srcUrl}"\n`;
+    instr += `Le champ "more" DOIT valoir exactement ${hasP2} (ne change pas cette valeur, c'est imposé).\n`;
     if (type === 'VIGNETTE') {
       instr += `Média à afficher (champ "media") : "${n.media || ''}"\n`;
       instr += `Légende (champ "caption") : "${n.mediaLegende || ''}"\n`;
@@ -300,7 +319,7 @@ const BASE_RULES = `Tu es Clartée, agent pédagogique. Règles absolues :
 
 // Construit les messages pour Mistral pour un moment donné
 function buildMomentMessages(kb, script, index, action) {
-  const instruction = getMomentInstruction(kb, script, index);
+  const instruction = getMomentInstruction(kb, script, index, action);
   const sys = BASE_RULES + `\n\n` + instruction;
   const userMsg = action && action.trim() ? action : 'Joue ce moment.';
   return [{ role: 'system', content: sys }, { role: 'user', content: userMsg }];

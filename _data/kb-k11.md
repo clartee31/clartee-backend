@@ -1,4 +1,4 @@
-﻿Module K11  
+Module K11  
 Titre = La crise de l’eau 
 Média = k11-kit.png (légende : Kit du module « La crise de l’eau »)
  
@@ -36,10 +36,10 @@ Média = k11-media21.png (légende : Population affectée par le stress hydrique
 On estime que 10 % de la hausse des flux migratoires sur la planète ont été liés à des déficits hydriques entre 1970 et 2000   
    
 ***Notion 2.2 (Source S07)  
-42% de l’eau domestique dans le monde n’est pas correctement traitée pour être potable  
+Dans le monde, 1 personne sur 4 (soit 2,1 milliards de personnes) n’a toujours pas accès à une eau potable saine. 
    
 Élément complémentaire (Source S04)   
-Une étude portant sur 258 cours d’eau de la planète a révélé que plus d’un quart d’entre eux possédaient des concentrations d’ingrédients pharmaceutiques actifs excédant les seuils de sûreté acceptables   
+106 millions de personnes sont contraintes de boire des eaux de surface non traitées. Or, une étude portant sur 258 cours d’eau de la planète a révélé que plus d’un quart d’entre eux possédaient des concentrations d’ingrédients pharmaceutiques actifs excédant les seuils de sûreté acceptables.
    
 ——————————————  
 Notions de la séquence 3  
@@ -72,7 +72,8 @@ S02 : Rapport du GIEC, 2023, *https://www.ipcc.ch/report/ar6/syr/*
    
 S03 : Zaveri et al., 2021, Flux et Reflux, Volume 1, Eau, Migration et Développement. *https://openknowledge.worldbank.org/server/api/core/bitstreams/fe8f27a1-3394-5a2b-a657-9da40befeb96/content* **  
    
-S04 : Wilkinson et al., 2022. « Pharmaceutical pollution of the world’s rivers ». Proceedings of the Natural Academy of Sciences, vol. 119, no 8, *https://www.pnas.org/doi/10.1073/pnas.2113947119*  
+S04 : Communiqué de Presse, UNICEF, Août 2025 https://www.unicef.fr/article/1-personne-sur-4-dans-le-monde-na-toujours-pas-acces-a-leau-potable/
+
    
 S05 :  R. K. Mishra, S.C. Dubey. 2023. “[Fresh Water Availability and It’s Global Challenge](https://www.mediresonline.org/fresh-water-availability-and-its-global-challenge.html "https://www.mediresonline.org/fresh-water-availability-and-its-global-challenge.html")”. [J. Mar. Sci. Res](https://www.mediresonline.org/journals/marine-science-and-research "https://www.mediresonline.org/journals/marine-science-and-research"). Vol 2, Iss 1., *https://www.mediresonline.org/fresh-water-availability-and-its-global-challenge.html*  
    
@@ -93,4 +94,5 @@ S12 : Water Calculator, 2017, *https://watercalculator.org/footprint/the-hidden-
    
 S13 : Got Sneakers, Reducing Pollution from Sneaker Waste, 2026  
 *https://gotsneakers.com/reducing-pollution-from-sneaker-waste/*  
+
 
