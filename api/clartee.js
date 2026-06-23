@@ -147,99 +147,114 @@ function loadModule(code) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-//  SÉRIALISATION KB + SCRIPT POUR LE PROMPT
+//  RÉSOLUTION D'UN MOMENT : prépare les données exactes du moment courant
 // ─────────────────────────────────────────────────────────────────────
-function kbToText(kb) {
-  let s = `MODULE ${kb.module} — ${kb.titre}\n`;
-  s += `Média KIT : ${kb.media || '(aucun)'}${kb.mediaLegende ? ' (légende : ' + kb.mediaLegende + ')' : ''}\n\n`;
-  s += `SÉQUENCES :\n`;
-  Object.entries(kb.sequences).forEach(([n, t]) => { s += `  Séquence ${n} : ${t}\n`; });
-  s += `\nNOTIONS :\n`;
-  kb.notions.forEach(n => {
-    s += `\n[Notion ${n.id}] (séquence ${n.sequence}, source ${n.source})\n`;
-    s += `  Texte (priorité 1) : ${n.texte}\n`;
-    s += `  Média : ${n.media || '(aucun)'}${n.mediaLegende ? ' (légende : ' + n.mediaLegende + ')' : ''}\n`;
-    if (n.complement) s += `  Élément complémentaire (priorité 2, source ${n.complementSource}) : ${n.complement}\n`;
-    else s += `  Élément complémentaire : (aucun — ne PAS afficher le bouton « En savoir plus »)\n`;
-  });
-  s += `\nSOURCES :\n`;
-  Object.entries(kb.sources).forEach(([id, src]) => { s += `  ${id} : ${src.libelle}${src.url ? ' — ' + src.url : ''}\n`; });
-  return s;
+function findNotion(kb, id) { return kb.notions.find(n => n.id === id) || null; }
+function sourceLabel(kb, code) {
+  const s = kb.sources[code];
+  if (!s) return code;
+  return s.libelle || code;
 }
 
-function scriptToText(script) {
-  let s = `SCRIPT DU MODULE ${script.module} — séquence de ${script.moments.length} moments à exécuter DANS L'ORDRE :\n\n`;
-  script.moments.forEach((m, i) => {
-    const n = String(i + 1).padStart(2, '0');
-    if (m.type === 'INTRO_MODULE') s += `${n}. INTRO_MODULE\n`;
-    else if (m.type === 'INTRO_SEQUENCE') s += `${n}. INTRO_SEQUENCE_${m.sequence}\n`;
-    else if (m.type === 'SYNTHESE') s += `${n}. SYNTHESE\n`;
-    else {
-      s += `${n}. ${m.type}_notion${m.notion}_${m.artefact}`;
-      if (!m.artefactValide) s += `  [⚠ TYPE INCONNU — utiliser TEXTE par défaut]`;
-      s += `\n`;
-      if (m.QUESTION) s += `      QUESTION imposée : ${m.QUESTION}\n`;
-      if (m.REPONSE_OK) s += `      REPONSE_OK imposée : ${m.REPONSE_OK}\n`;
-      if (m.REPONSE_KO) s += `      REPONSE_KO imposées : ${JSON.stringify(m.REPONSE_KO)}\n`;
-      if (m.FEEDBACK_OK) s += `      FEEDBACK_OK imposé : ${m.FEEDBACK_OK}\n`;
-      if (m.FEEDBACK_KO) s += `      FEEDBACK_KO imposé : ${m.FEEDBACK_KO}\n`;
+function getMomentInstruction(kb, script, index) {
+  const m = script.moments[index];
+  if (!m) return null;
+  const total = script.moments.length;
+  const isLast = index === total - 1;
+
+  // Contexte commun, compact
+  let instr = `Tu joues UNIQUEMENT le moment ${index + 1} sur ${total} du module "${kb.titre}" (${kb.module}). Tu ne joues PAS les autres moments. Tu produis exactement UN message (texte OU un seul artefact JSON), puis tu t'arrêtes.\n\n`;
+
+  if (m.type === 'INTRO_MODULE') {
+    const seqList = Object.entries(kb.sequences).map(([n, t]) => `${n}) ${t}`).join(', ');
+    instr += `MOMENT : INTRO_MODULE.\nProduis un court message texte (2-3 phrases) d'accueil qui présente le sujet du module "${kb.titre}" et annonce les ${Object.keys(kb.sequences).length} séquences : ${seqList}. Termine en invitant à appuyer sur « Continuer ». N'évalue rien. Pas d'artefact JSON, juste du texte.`;
+    return instr;
+  }
+
+  if (m.type === 'INTRO_SEQUENCE') {
+    const titre = kb.sequences[m.sequence] || '';
+    instr += `MOMENT : INTRO_SEQUENCE_${m.sequence}.\nProduis UNE seule phrase de transition annonçant la séquence ${m.sequence} : "${titre}". Court, en texte. Pas d'artefact, pas d'évaluation.`;
+    return instr;
+  }
+
+  if (m.type === 'SYNTHESE') {
+    instr += `MOMENT : SYNTHESE (dernier moment du module).\nProduis un court récapitulatif des points clés du module (3-5 puces maximum, en texte markdown). Puis indique sur une dernière ligne, exactement : [[KIT:${kb.media || 'kit.png'}]]\nNe répète pas une conclusion déjà faite. Ne dis pas "Continuer" (c'est la fin). Pas d'artefact JSON.`;
+    return instr;
+  }
+
+  // TRANSMETTRE ou EVALUER : il faut la notion
+  const n = findNotion(kb, m.notion);
+  if (!n) { instr += `MOMENT : ${m.type} notion ${m.notion} (notion introuvable, produis un court texte d'erreur neutre).`; return instr; }
+
+  const srcLabel = sourceLabel(kb, n.source);
+  const hasP2 = !!n.complement;
+
+  if (m.type === 'TRANSMETTRE') {
+    const type = m.artefactValide ? m.artefact : 'TEXTE';
+    instr += `MOMENT : TRANSMETTRE notion ${n.id} via l'artefact ${type} (type imposé, ne change pas).\n`;
+    instr += `Tu PRÉSENTES la notion sans l'évaluer. Tu produis UNIQUEMENT l'artefact JSON ${type} ci-dessous, rien d'autre.\n\n`;
+    instr += `CONTENU EXACT DE LA NOTION (à ne pas déformer, reprends fidèlement les chiffres et le sens) :\n"${n.texte}"\n\n`;
+    instr += `Source à afficher en clair (champ "source") : "${srcLabel}"\n`;
+    if (type === 'VIGNETTE') {
+      instr += `Média à afficher (champ "media") : "${n.media || ''}"\n`;
+      instr += `Légende (champ "caption") : "${n.mediaLegende || ''}"\n`;
+      instr += `\nProduis : {"type":"vignette","title":"<titre court de la notion>","text":"<le contenu de la notion, fidèle, reformulé de façon claire mais SANS changer les chiffres ni le sens>","media":"${n.media || ''}","caption":"${n.mediaLegende || ''}","source":"${srcLabel}","more":${hasP2}}`;
+    } else {
+      instr += `\nProduis : {"type":"texte","title":"<titre court de la notion>","text":"<le contenu de la notion, fidèle, SANS changer les chiffres ni le sens>","source":"${srcLabel}","more":${hasP2}}`;
     }
-  });
-  return s;
+    return instr;
+  }
+
+  if (m.type === 'EVALUER') {
+    const type = m.artefactValide ? m.artefact : 'QCM';
+    instr += `MOMENT : EVALUER notion ${n.id} via l'artefact ${type} (type imposé, ne change pas).\n`;
+    instr += `Tu ÉVALUES l'apprenant. Tu produis UNIQUEMENT l'artefact JSON ${type}, rien d'autre.\n\n`;
+    instr += `CONTENU DE RÉFÉRENCE DE LA NOTION (pour construire la question, sans déformer) :\n"${n.texte}"\n\n`;
+    if (m.QUESTION) instr += `QUESTION imposée (utilise-la telle quelle) : "${m.QUESTION}"\n`;
+    if (m.REPONSE_OK) instr += `BONNE réponse imposée : "${m.REPONSE_OK}"\n`;
+    if (m.REPONSE_KO && m.REPONSE_KO.length) instr += `MAUVAISES réponses imposées : ${JSON.stringify(m.REPONSE_KO)}\n`;
+    if (m.FEEDBACK_OK) instr += `Feedback si correct : "${m.FEEDBACK_OK}"\n`;
+    if (m.FEEDBACK_KO) instr += `Feedback si incorrect : "${m.FEEDBACK_KO}"\n`;
+    instr += `\n`;
+    if (type === 'QCM') {
+      instr += `Produis un QCM. Place la bonne réponse et les distracteurs dans "options" (mélangés), "correct" = index de la bonne réponse. "explanation" = le feedback.\n`;
+      instr += `{"type":"qcm","question":"...","options":["A. ...","B. ...","C. ..."],"correct":0,"explanation":"..."}`;
+    } else if (type === 'DRAGDROP') {
+      instr += `Produis un DRAGDROP cohérent avec la notion. "items" = étiquettes, "targets" = zones, "solution" = associations correctes.\n`;
+      instr += `{"type":"dragdrop","instruction":"Glissez chaque étiquette sur la bonne zone, puis validez. ...","items":["..."],"targets":["..."],"solution":{"...":"..."},"explanation":"..."}`;
+    } else if (type === 'SCALE') {
+      instr += `Produis un SCALE. "mode" = "valeurs" | "accord" | "dates". "labels" = repères des extrémités. "correct" = index attendu (null en mode accord).\n`;
+      instr += `{"type":"scale","mode":"valeurs","question":"...","options":["..."],"labels":["...","..."],"correct":2,"explanation":"..."}`;
+    } else { // VIGNETTE/TEXTE utilisés en évaluation : on retombe sur QCM par sécurité
+      instr += `Produis un QCM.\n{"type":"qcm","question":"...","options":["A. ...","B. ...","C. ..."],"correct":0,"explanation":"..."}`;
+    }
+    return instr;
+  }
+
+  return instr;
 }
 
-// ─────────────────────────────────────────────────────────────────────
-//  PROMPT SYSTÈME — l'IP Clartée (règles + 5 artefacts validés)
-// ─────────────────────────────────────────────────────────────────────
-function buildSystemPrompt(kb, script) {
-  return `Tu es Clartée, agent pédagogique IA souverain. Tu fais découvrir, comprendre et ancrer une connaissance, étape par étape.
+// Petit prompt système commun, compact (l'IP de forme reste, mais le pilotage vient du moteur)
+const BASE_RULES = `Tu es Clartée, agent pédagogique. Règles absolues :
+- Tu produis EXACTEMENT un message : soit un court texte, soit UN artefact JSON pur (rien avant/après).
+- Tu n'inventes aucun chiffre : tu reprends fidèlement le contenu fourni.
+- Tu n'utilises JAMAIS le tiret cadratin (utilise virgule, deux-points, parenthèses).
+- Tu ne joues que le moment demandé, puis tu t'arrêtes.`;
 
-RÈGLE D'OR : tu suis le SCRIPT à la lettre, dans l'ordre, un moment à la fois. Tu n'inventes aucun contenu factuel : tout vient de la BASE DE CONNAISSANCES (KB). Le SCRIPT dit QUOI faire et QUAND ; la KB dit le contenu ; toi tu produis la forme.
+// Construit les messages pour Mistral pour un moment donné
+function buildMomentMessages(kb, script, index, action) {
+  const instruction = getMomentInstruction(kb, script, index);
+  const sys = BASE_RULES + `\n\n` + instruction;
+  const userMsg = action && action.trim() ? action : 'Joue ce moment.';
+  return [{ role: 'system', content: sys }, { role: 'user', content: userMsg }];
+}
 
-CONTRAINTE ABSOLUE SUR LES ARTEFACTS : le type d'artefact est STRICTEMENT imposé par le script (le suffixe _QCM, _VIGNETTE, _TEXTE, _DRAGDROP, _SCALE). Tu n'en changes JAMAIS. Si un type est marqué inconnu, utilise TEXTE.
-
-FORMAT DE SORTIE : chaque message est SOIT du texte court (2-3 phrases, markdown simple) SOIT un artefact JSON pur (rien avant, rien après). Jamais les deux dans le même message.
-
-TYPOGRAPHIE : n'utilise JAMAIS le tiret cadratin. Utilise une virgule, deux-points ou parenthèses.
-
-═══ LES 5 ARTEFACTS (modèles JSON EXACTS) ═══
-
-1) QCM — évaluation à choix unique. Si QUESTION/REPONSE_OK/REPONSE_KO sont imposés dans le script, tu les utilises tels quels (la bonne réponse + les distracteurs, mélangés). "correct" est l'index de la bonne réponse.
-{"type":"qcm","question":"...","options":["A. ...","B. ...","C. ..."],"correct":0,"explanation":"..."}
-
-2) VIGNETTE — transmission avec média. Média en haut, titre, texte court de la notion, légende avec la source en clair. "more":true UNIQUEMENT si la notion a un élément complémentaire.
-{"type":"vignette","title":"...","text":"...","media":"k11-media12.png","caption":"...","source":"S01","more":true}
-
-3) TEXTE — transmission sans média (notions conceptuelles). Titre + paragraphe + source. "more":true seulement si élément complémentaire.
-{"type":"texte","title":"...","text":"...","source":"S08","more":true}
-
-4) DRAGDROP — évaluation par correspondances. Étiquettes neutres, mélangées. "solution" associe chaque item à sa cible.
-{"type":"dragdrop","instruction":"Glissez chaque étiquette sur la bonne zone, puis validez. ...","items":["20 %","70 %","12 %"],"targets":["Agriculture","Industrie","Ménages"],"solution":{"70 %":"Agriculture","20 %":"Industrie","12 %":"Ménages"},"explanation":"..."}
-
-5) SCALE — évaluation sur une échelle graduée. "mode" vaut "valeurs", "accord" ou "dates". "labels" = repères des deux extrémités. "correct" = index attendu (null en mode accord, pas de bonne réponse).
-{"type":"scale","mode":"valeurs","question":"...","options":["10 %","25 %","50 %","75 %","90 %"],"labels":["Peu","Quasi tout"],"correct":2,"explanation":"..."}
-
-═══ EXÉCUTION DES MOMENTS ═══
-
-INTRO_MODULE : message texte d'accueil présentant le sujet du module et annonçant les séquences. Termine en invitant à appuyer sur « Continuer ».
-
-INTRO_SEQUENCE_N : une phrase de transition annonçant la séquence N. Enchaîne directement.
-
-TRANSMETTRE_notionX.Y_TYPE : présente la notion X.Y via l'artefact imposé (en général VIGNETTE ou TEXTE), avec le média associé si VIGNETTE. Tu n'évalues pas. Boutons proposés par l'artefact : « Continuer », « Me réexpliquer », et « En savoir plus » UNIQUEMENT si la notion a un élément complémentaire (P2).
-- « Me réexpliquer » : tu entres dans un court dialogue (texte) pour comprendre le blocage et reformuler autrement.
-- « En savoir plus » : tu présentes l'élément complémentaire (P2), puis seulement « Continuer » et « Me réexpliquer ».
-
-EVALUER_notionX.Y_TYPE : évalue via l'artefact imposé. Utilise QUESTION/REPONSE_OK/REPONSE_KO/FEEDBACK_OK/FEEDBACK_KO s'ils sont imposés ; sinon construis-les depuis la notion. Après le feedback de l'apprenant, reformule succinctement la notion (texte court) et affiche le média associé s'il existe, puis « Continuer » / « Me réexpliquer ».
-
-SYNTHESE : récapitulatif des points clés du module, puis affichage du KIT (image png du module) téléchargeable.
-
-═══ SCRIPT À EXÉCUTER ═══
-
-${scriptToText(script)}
-
-═══ BASE DE CONNAISSANCES ═══
-
-${kbToText(kb)}`;
+// Détermine le prochain index selon le moment courant et l'action de l'apprenant.
+// Les actions "Me réexpliquer" et "En savoir plus" NE font PAS avancer (on reste sur le moment).
+function nextIndex(script, index, action) {
+  const a = (action || '').toLowerCase();
+  if (a.includes('réexpli') || a.includes('reexpli') || a.includes('savoir plus')) return index; // reste
+  return Math.min(index + 1, script.moments.length); // avance (peut dépasser = fin)
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -290,7 +305,7 @@ function mistralRequest(messages) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-//  HANDLER VERCEL
+//  HANDLER VERCEL — piloté moment par moment
 // ─────────────────────────────────────────────────────────────────────
 async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -299,25 +314,60 @@ async function handler(req, res) {
   if (req.method === 'OPTIONS') { res.status(204).end(); return; }
   if (req.method !== 'POST') { res.status(404).json({ error: 'Not found' }); return; }
 
-  const { code, module: moduleCode, messages, mode } = req.body;
-  if (!messages) { res.status(400).json({ error: 'Missing messages' }); return; }
+  const body = req.body || {};
+  const { code, module: moduleCode, mode } = body;
 
-  let systemPrompt;
+  // Mode "partager" : dialogue libre, inchangé
+  if (mode === 'partager') {
+    const messages = body.messages;
+    if (!messages) { res.status(400).json({ error: 'Missing messages' }); return; }
+    const fullMessages = [{ role: 'system', content: SYSTEM_PROMPT_PARTAGER }, ...messages];
+    try {
+      const text = await mistralRequest(fullMessages);
+      res.status(200).json({ content: [{ text }] });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+    return;
+  }
+
+  // Mode "formation" : piloté par index de moment
+  let kb, script;
   try {
-    if (mode === 'partager') {
-      systemPrompt = SYSTEM_PROMPT_PARTAGER;
-    } else {
-      const { kb, script } = loadModule(code || moduleCode || 'k11');
-      systemPrompt = buildSystemPrompt(kb, script);
-    }
+    ({ kb, script } = loadModule(code || moduleCode || 'k11'));
   } catch (err) {
     res.status(500).json({ error: 'Chargement module : ' + err.message }); return;
   }
 
-  const fullMessages = [{ role: 'system', content: systemPrompt }, ...messages];
+  // index courant (le moment à jouer), action de l'apprenant
+  let index = Number.isInteger(body.index) ? body.index : 0;
+  const action = body.action || '';
+
+  // Détermine quel moment jouer : si l'action fait avancer, on passe au suivant ; sinon on reste.
+  // Au tout premier appel (action de démarrage), on joue le moment 0.
+  let playIndex;
+  if (action && !/d[ée]marrer/i.test(action)) {
+    playIndex = nextIndex(script, index, action);
+  } else {
+    playIndex = 0;
+  }
+
+  // Fin du module ?
+  if (playIndex >= script.moments.length) {
+    res.status(200).json({ content: [{ text: '' }], index: playIndex, total: script.moments.length, done: true });
+    return;
+  }
+
+  const messages = buildMomentMessages(kb, script, playIndex, action);
   try {
-    const text = await mistralRequest(fullMessages);
-    res.status(200).json({ content: [{ text }] });
+    const text = await mistralRequest(messages);
+    const moment = script.moments[playIndex];
+    res.status(200).json({
+      content: [{ text }],
+      index: playIndex,
+      total: script.moments.length,
+      momentType: moment.type,
+      isLast: playIndex === script.moments.length - 1,
+      done: false
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -327,7 +377,7 @@ module.exports = handler;
 module.exports.parseKB = parseKB;
 module.exports.parseScript = parseScript;
 module.exports.loadModule = loadModule;
-module.exports.buildSystemPrompt = buildSystemPrompt;
-module.exports.kbToText = kbToText;
-module.exports.scriptToText = scriptToText;
+module.exports.getMomentInstruction = getMomentInstruction;
+module.exports.buildMomentMessages = buildMomentMessages;
+module.exports.nextIndex = nextIndex;
 module.exports.ARTEFACTS = ARTEFACTS;

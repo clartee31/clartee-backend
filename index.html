@@ -573,9 +573,10 @@ const ROLES={
 };
 
 let currentRole='collaborateur',currentPage='accueil';
-let agentHistory=[],partagerHistory=[];
+let partagerHistory=[];
 let agentTyping=false,partagerTyping=false;
 let currentCode='';
+let currentIndex=0;       // index du moment courant déjà joué
 let draggedItem=null;
 
 async function doLogin(){
@@ -630,13 +631,13 @@ function switchRole(role){
 // AGENT FORMATION
 function openModule(code,titre){
   currentCode=code;
-  agentHistory=[];
+  currentIndex=0;
   document.getElementById('agentThemeTitle').textContent=titre||code;
   document.getElementById('agentMsgs').innerHTML='';
   document.getElementById('agentQR').innerHTML='';
   goPage('agent');
-  // Le script démarre par INTRO_MODULE : on lance l'agent avec un signal de démarrage
-  setTimeout(()=>{ sendAgentSilent('Démarrer le module'); },200);
+  // Lance le moment 0 (INTRO_MODULE). 'Démarrer' = signal de départ géré par le moteur.
+  setTimeout(()=>{ playMoment('Démarrer'); },200);
 }
 
 function addMsg(role,content){
@@ -670,40 +671,36 @@ function hideTyping(){const t=document.getElementById('agentTyping');if(t)t.remo
 function updateAgentSend(){document.getElementById('agentSend').disabled=document.getElementById('agentInput').value.trim().length===0||agentTyping;}
 function handleAgentKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(!document.getElementById('agentSend').disabled)sendAgent();}}
 
-async function sendAgent(){
-  const input=document.getElementById('agentInput');
-  const text=input.value.trim();if(!text||agentTyping)return;
+// Envoi piloté par moment : on transmet l'index courant et l'action.
+// Le moteur décide quel moment jouer et renvoie le nouvel index.
+async function playMoment(action){
+  if(agentTyping)return;
   document.getElementById('agentQR').innerHTML='';
-  addMsg('user',text);input.value='';updateAgentSend();
   agentTyping=true;document.getElementById('agentSend').disabled=true;
-  agentHistory.push({role:'user',content:text});
   showTyping();
   try{
-    const res=await fetch(BACKEND_CLARTEE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:currentCode,messages:agentHistory})});
+    const res=await fetch(BACKEND_CLARTEE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:currentCode,index:currentIndex,action:action||''})});
     const data=await res.json();hideTyping();
-    const raw=data.content[0].text.trim();
-    agentHistory.push({role:'assistant',content:raw});
+    if(data.done){ agentTyping=false;updateAgentSend(); return; }
+    if(typeof data.index==='number') currentIndex=data.index;
+    const raw=(data.content&&data.content[0]&&data.content[0].text||'').trim();
     handleResponse(raw);
   }catch(err){hideTyping();addMsg('agent','Erreur : '+err.message);}
   agentTyping=false;updateAgentSend();
 }
 
-// Envoie un signal à l'agent SANS afficher de bulle utilisateur (Démarrer, Continuer, Me réexpliquer, Répondu...)
-async function sendAgentSilent(signal){
-  if(agentTyping)return;
+// Saisie libre de l'apprenant (utile dans le dialogue « Me réexpliquer ») : affiche la bulle, ne fait pas avancer.
+async function sendAgent(){
+  const input=document.getElementById('agentInput');
+  const text=input.value.trim();if(!text||agentTyping)return;
   document.getElementById('agentQR').innerHTML='';
-  agentTyping=true;document.getElementById('agentSend').disabled=true;
-  agentHistory.push({role:'user',content:signal});
-  showTyping();
-  try{
-    const res=await fetch(BACKEND_CLARTEE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:currentCode,messages:agentHistory})});
-    const data=await res.json();hideTyping();
-    const raw=data.content[0].text.trim();
-    agentHistory.push({role:'assistant',content:raw});
-    handleResponse(raw);
-  }catch(err){hideTyping();addMsg('agent','Erreur : '+err.message);}
-  agentTyping=false;updateAgentSend();
+  addMsg('user',text);input.value='';updateAgentSend();
+  // Une saisie libre est traitée comme « Me réexpliquer » enrichi du texte de l'apprenant : on reste sur le moment.
+  playMoment('Me réexpliquer : '+text);
 }
+
+// Conservé pour compatibilité : un signal sans bulle = un avancement piloté.
+function sendAgentSilent(signal){ playMoment(signal); }
 
 
 // ════════════════════════════════════════════════════════════════════
@@ -713,13 +710,22 @@ async function sendAgentSilent(signal){
 function resolveMedia(name){ return name ? (MEDIA_BASE + name) : null; }
 
 function handleResponse(raw){
-  // Un message = soit texte, soit UN artefact JSON pur. On tente d'extraire un objet JSON.
+  // Marqueur KIT de la SYNTHESE : [[KIT:fichier.png]]
+  const kitMatch=raw.match(/\[\[KIT:([^\]]+)\]\]/);
+  if(kitMatch){
+    const kitFile=kitMatch[1].trim();
+    const textPart=raw.replace(/\[\[KIT:[^\]]+\]\]/,'').trim();
+    if(textPart) addMsg('agent',textPart);
+    renderKit(kitFile);
+    return; // fin du module, pas de bouton Continuer
+  }
+
+  // Un message = soit texte, soit UN artefact JSON pur.
   let parsed=null;
   const match=raw.match(/\{[\s\S]*\}/);
   if(match){ try{ parsed=JSON.parse(match[0]); }catch(e){ parsed=null; } }
 
   if(!parsed||!parsed.type){
-    // Message texte (INTRO_MODULE, INTRO_SEQUENCE, reformulation, dialogue...)
     addMsg('agent',raw);
     afterTextMessage(raw);
     return;
@@ -735,8 +741,22 @@ function handleResponse(raw){
   }
 }
 
-// Après un message texte de l'agent : proposer « Continuer » sauf si l'agent pose une question
-// (dans ce cas l'apprenant tape sa réponse, ex. dialogue « Me réexpliquer »).
+// Affiche le KIT du module en image téléchargeable (fin de module)
+function renderKit(file){
+  const card=document.createElement('div');card.className='art-vignette';
+  const mediaWrap=document.createElement('div');mediaWrap.className='vig-media';
+  const a=document.createElement('a');a.href=resolveMedia(file);a.download=file;a.title='Télécharger le kit';
+  const img=document.createElement('img');img.src=resolveMedia(file);img.alt='Kit du module';
+  img.onerror=()=>{mediaWrap.innerHTML='<div style="font-size:12px;color:var(--ink-light);padding:1rem;">Kit indisponible</div>';};
+  a.appendChild(img);mediaWrap.appendChild(a);card.appendChild(mediaWrap);
+  const body=document.createElement('div');body.className='vig-body';
+  body.innerHTML='<div class="vig-title">Votre kit récapitulatif</div><div class="vig-text">Cliquez sur l\'image pour télécharger le kit du module.</div>';
+  card.appendChild(body);
+  addArtifact(card);
+  document.getElementById('agentQR').innerHTML='';
+}
+
+// Après un message texte de l'agent : proposer « Continuer » sauf si l'agent pose une question.
 function afterTextMessage(text){
   const t=(text||'').trim();
   const isQuestion=/[?？]\s*$/.test(t);
@@ -793,7 +813,7 @@ function renderQCM(data){
       const fb=document.createElement('div');fb.className='art-fb '+(ok?'ok':'ko');
       fb.textContent=(ok?'✓ ':'✗ ')+(data.explanation||'');wrap.appendChild(fb);
       // L'agent reformule la notion puis propose Continuer/Me réexpliquer (géré côté script)
-      setTimeout(()=>sendAgentSilent(ok?'Bonne réponse':'Mauvaise réponse'),900);
+      setTimeout(()=>setQR(['Continuer']),700);
     };
     wrap.appendChild(btn);
   });
@@ -890,7 +910,7 @@ function renderDragDrop(data){
     btn.disabled=true;btn.style.opacity='.5';btn.style.pointerEvents='none';
     const fb=document.createElement('div');fb.className='art-fb '+(allOk?'ok':'ko');
     fb.textContent=(allOk?'✓ ':'✗ ')+(data.explanation||'');wrap.appendChild(fb);
-    setTimeout(()=>sendAgentSilent(allOk?'Bonne réponse':'Mauvaise réponse'),900);
+    setTimeout(()=>setQR(['Continuer']),700);
   };
   wrap.appendChild(btn);
   addArtifact(wrap);
@@ -927,8 +947,7 @@ function renderScale(data){
         const fb=document.createElement('div');fb.className='art-fb '+(ok?'ok':'ko');
         fb.textContent=(isAccord?'':(ok?'✓ ':'✗ '))+data.explanation;wrap.appendChild(fb);
       }
-      const signal=isAccord?'Positionné':((i===data.correct)?'Bonne réponse':'Mauvaise réponse');
-      setTimeout(()=>sendAgentSilent(signal),900);
+      setTimeout(()=>setQR(['Continuer']),700);
     };
     row.appendChild(btn);
   });
