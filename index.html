@@ -69,7 +69,7 @@
 
     /* ACCUEIL */
     .welcome{font-family:var(--font-display);font-size:1.3rem;font-weight:400;color:var(--foret);margin-bottom:1.1rem;}
-    .domains-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+    .domains-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,360px));gap:.75rem;}
     .domain-card{background:white;border:1px solid var(--border);border-radius:12px;padding:.9rem;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;}
     .domain-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
     .domain-card.d1::before{background:var(--foret);}
@@ -452,7 +452,7 @@
 
       <!-- SE FORMER -->
       <div class="page" id="page-formation">
-        <div class="page-title">Se former</div>
+        <div class="page-title">Me former</div>
         <div class="sec-label">Disponible maintenant</div>
         <div class="parcours-item" onclick="openModule('k11','Green Déclic : La crise de l\'eau')"><div class="parcours-ico"><i class="ti ti-droplet"></i></div><span class="parcours-name">Green Déclic : La crise de l'eau</span><span class="parcours-prog">3 séquences</span></div>
         <div class="sec-label" style="margin-top:.9rem;">Bientôt disponible</div>
@@ -547,6 +547,10 @@
         <div class="parcours-row"><span class="parcours-row-name">Sécurité machines</span><span class="status-pill dep">Déployé</span><span class="parcours-steps">5 étapes</span><button class="row-edit-btn"><i class="ti ti-pencil"></i></button></div>
         <div class="parcours-row"><span class="parcours-row-name">Qualité produit</span><span class="status-pill dra">Brouillon</span><span class="parcours-steps">6 étapes</span><button class="row-edit-btn"><i class="ti ti-pencil"></i></button></div>
         <div class="parcours-row"><span class="parcours-row-name">Accueil commercial</span><span class="status-pill arc">Archivé</span><span class="parcours-steps">4 étapes</span><button class="row-edit-btn"><i class="ti ti-pencil"></i></button></div>
+        <div class="sec-label" style="margin-top:1.1rem;">Parcours achetés</div>
+        <div class="parcours-row"><span class="parcours-row-name">Green Déclic : La crise de l'eau</span><span class="status-pill dep">Déployé</span><span class="parcours-steps">3 séquences</span><button class="row-edit-btn"><i class="ti ti-eye"></i></button></div>
+        <div class="parcours-row"><span class="parcours-row-name">Blue Déclic : Performance numérique et IA</span><span class="status-pill dra">Non assigné</span><span class="parcours-steps">Sur étagère</span><button class="row-edit-btn"><i class="ti ti-eye"></i></button></div>
+        <div class="parcours-row"><span class="parcours-row-name">Nouveau Monde : Écologie et numérique</span><span class="status-pill dra">Non assigné</span><span class="parcours-steps">Sur étagère</span><button class="row-edit-btn"><i class="ti ti-eye"></i></button></div>
       </div>
 
       <!-- SUIVI APPRENANTS -->
@@ -565,6 +569,8 @@
             <div class="pv-row"><span class="pv-name">Onboarding atelier</span><span class="pv-count">12 apprenants</span><button class="pv-edit"><i class="ti ti-pencil"></i></button></div>
             <div class="pv-row"><span class="pv-name">Sécurité machines</span><span class="pv-count">4 apprenants</span><button class="pv-edit"><i class="ti ti-pencil"></i></button></div>
             <div class="pv-row"><span class="pv-name">Qualité produit</span><span class="pv-count">7 apprenants</span><button class="pv-edit"><i class="ti ti-pencil"></i></button></div>
+            <div class="pv-row"><span class="pv-name">Green Déclic : La crise de l'eau</span><span class="pv-count">18 apprenants</span><button class="pv-edit"><i class="ti ti-pencil"></i></button></div>
+            <div class="pv-row"><span class="pv-name">Blue Déclic : Performance numérique et IA</span><span class="pv-count">9 apprenants</span><button class="pv-edit"><i class="ti ti-pencil"></i></button></div>
           </div>
         </div>
       </div>
@@ -582,9 +588,9 @@ if(typeof marked!=='undefined'&&marked.setOptions){ marked.setOptions({breaks:tr
 const MEDIA_BASE='/medias/';
 
 const ROLES={
-  collaborateur:{user:'Marie',init:'M',nav:[{id:'accueil',icon:'ti-home',label:'Accueil'},{id:'formation',icon:'ti-book',label:'Se former'},{id:'partager',icon:'ti-bulb',label:'Partager'}]},
-  km:{user:'Catherine',init:'C',nav:[{id:'accueil',icon:'ti-home',label:'Accueil'},{id:'formation',icon:'ti-book',label:'Se former'},{id:'partager',icon:'ti-bulb',label:'Partager'},{div:true},{id:'validation',icon:'ti-check',label:'File de validation'},{id:'base',icon:'ti-database',label:'Base de connaissances'}]},
-  lm:{user:'Pierre',init:'P',nav:[{id:'accueil',icon:'ti-home',label:'Accueil'},{id:'formation',icon:'ti-book',label:'Se former'},{id:'partager',icon:'ti-bulb',label:'Partager'},{div:true},{id:'parcours',icon:'ti-route',label:'Parcours'},{id:'apprenants',icon:'ti-users',label:'Suivi des apprenants'}]}
+  collaborateur:{user:'Marie',init:'M',nav:[{id:'accueil',icon:'ti-home',label:'Accueil'},{id:'formation',icon:'ti-book',label:'Me former'},{id:'partager',icon:'ti-bulb',label:'Partager'}]},
+  km:{user:'Catherine',init:'C',nav:[{id:'accueil',icon:'ti-home',label:'Accueil'},{id:'formation',icon:'ti-book',label:'Me former'},{id:'partager',icon:'ti-bulb',label:'Partager'},{div:true},{id:'validation',icon:'ti-check',label:'File de validation'},{id:'base',icon:'ti-database',label:'Base de connaissances'}]},
+  lm:{user:'Pierre',init:'P',nav:[{id:'accueil',icon:'ti-home',label:'Accueil'},{id:'formation',icon:'ti-book',label:'Me former'},{id:'partager',icon:'ti-bulb',label:'Partager'},{div:true},{id:'parcours',icon:'ti-route',label:'Parcours'},{id:'apprenants',icon:'ti-users',label:'Suivi des apprenants'}]}
 };
 
 let currentRole='collaborateur',currentPage='accueil';
@@ -632,7 +638,7 @@ function goPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const p=document.getElementById('page-'+id);if(p)p.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const labels={accueil:'Accueil',formation:'Se former',partager:'Partager',validation:'File de validation',base:'Base de connaissances',parcours:'Parcours',apprenants:'Suivi des apprenants'};
+  const labels={accueil:'Accueil',formation:'Me former',partager:'Partager',validation:'File de validation',base:'Base de connaissances',parcours:'Parcours',apprenants:'Suivi des apprenants'};
   document.querySelectorAll('.nav-item').forEach(n=>{if(n.textContent.trim()===labels[id])n.classList.add('active');});
   currentPage=id;
 }
