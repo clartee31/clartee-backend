@@ -32,7 +32,15 @@ Média = sigys-epi.png (légende : Les 8 EPI obligatoires en atelier)
 MediaSide = gauche  
    
 Élément complémentaire (Source S04)  
-Les EPI portés en atelier protègent chacun une partie du corps face à un risque précis. Le casque de chantier protège la tête des chocs et des chutes d'objets. Les lunettes de protection préservent les yeux des projections de copeaux et de poussière de bois. Les bouchons d'oreille atténuent le bruit des machines pour protéger l'audition. Le masque évite d'inhaler les poussières fines de ponçage. L'uniforme de protection couvre le corps et limite les accrochages aux machines. Le harnais sécurise lors d'un travail en hauteur. Les gants protègent les mains des coupures et des échardes. Les chaussures de sécurité protègent les pieds des chutes d'objets lourds.  
+Les EPI portés en atelier protègent chacun une partie du corps face à un risque précis.  
+1. Le casque de chantier protège la tête des chocs et des chutes d'objets.  
+2. Les lunettes de protection préservent les yeux des projections de copeaux et de poussière de bois.  
+3. Les bouchons d'oreille atténuent le bruit des machines pour protéger l'audition.  
+4. Le masque évite d'inhaler les poussières fines de ponçage.  
+5. L'uniforme de protection couvre le corps et limite les accrochages aux machines.  
+6. Le harnais sécurise lors d'un travail en hauteur.  
+7. Les gants protègent les mains des coupures et des échardes.  
+8. Les chaussures de sécurité protègent les pieds des chutes d'objets lourds.  
    
 ***Notion 2.2 (Source S05)  
 SIGYS s'appuie sur quelques outils numériques simples : une adresse email professionnelle au format prenom.nom@sigys.fr pour toute communication, et un ERP interne pour le suivi des commandes, des stocks et des plannings d'atelier. En cas de blocage informatique, on s'adresse au responsable IT, pas à son responsable direct.  

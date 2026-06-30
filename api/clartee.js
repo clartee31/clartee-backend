@@ -77,8 +77,17 @@ function parseKB(raw) {
       continue;
     }
     if (currentNotion) {
-      if (captureComplement) currentNotion.complement += (currentNotion.complement ? ' ' : '') + line;
-      else currentNotion.texte += (currentNotion.texte ? ' ' : '') + line.replace(/^Message clé\s*:\s*/i, '');
+      if (captureComplement) {
+        const isListItem = /^(\s*\d+\.|\s*[-*])\s+/.test(line);
+        const sep = currentNotion.complement ? (isListItem ? '\n' : ' ') : '';
+        currentNotion.complement += sep + line;
+      }
+      else {
+        const ln = line.replace(/^Message clé\s*:\s*/i, '');
+        const isListItem = /^(\s*\d+\.|\s*[-*])\s+/.test(ln);
+        const sep = currentNotion.texte ? (isListItem ? '\n' : ' ') : '';
+        currentNotion.texte += sep + ln;
+      }
     }
   }
   pushNotion();
@@ -489,6 +498,33 @@ async function handler(req, res) {
       done: false
     });
     return;
+  }
+
+  // Cas spécial : "En savoir plus" sur une TRANSMETTRE => le complément vient de la KB (déterministe).
+  // On construit le JSON texte côté serveur, sans passer par Mistral : JSON.stringify échappe
+  // correctement apostrophes et retours à la ligne, ce qui évite tout JSON malformé côté client.
+  if (moment.type === 'TRANSMETTRE' && /savoir plus/i.test(action || '')) {
+    const n = findNotion(kb, moment.notion);
+    if (n && n.complement) {
+      const cSrc = sourceInfo(kb, n.complementSource || n.source);
+      const json = {
+        type: 'texte',
+        title: 'Pour aller plus loin',
+        text: n.complement,
+        source: cSrc.label || '',
+        sourceUrl: cSrc.url || '',
+        more: false
+      };
+      res.status(200).json({
+        content: [{ text: JSON.stringify(json) }],
+        index: playIndex,
+        total: script.moments.length,
+        momentType: moment.type,
+        isLast: playIndex === script.moments.length - 1,
+        done: false
+      });
+      return;
+    }
   }
 
   const messages = buildMomentMessages(kb, script, playIndex, action);
