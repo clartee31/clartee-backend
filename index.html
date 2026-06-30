@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clartée</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23F5F0E6'/%3E%3Ctext x='30' y='46' font-family='Georgia,serif' font-size='38' font-weight='700' fill='%231F4A3A' text-anchor='middle'%3EC%3C/text%3E%3Cg stroke-linecap='round'%3E%3Cline x1='44' y1='20' x2='40' y2='10' stroke='%237A9B9B' stroke-width='2.5'/%3E%3Cline x1='47' y1='21' x2='52' y2='14' stroke='%23C45A3A' stroke-width='2.5'/%3E%3Cline x1='49' y1='24' x2='57' y2='22' stroke='%231F4A3A' stroke-width='2.5'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Caladea:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -81,6 +82,12 @@
     .dc-badge.g{background:var(--foret-light);color:var(--foret);}
     .dc-badge.t{background:var(--terra-light);color:var(--terra);}
     .dc-badge.soon{background:var(--cream-dark);color:var(--ink-light);}
+    .dc-badge.demo{background:var(--terra);color:#fff;font-weight:700;letter-spacing:.02em;}
+    .domain-card.pending{cursor:default;border-style:dashed;border-color:rgba(196,90,58,.35);background:var(--terra-light);}
+    .domain-card.pending:hover{transform:none;border-color:rgba(196,90,58,.35);}
+    .domain-card.pending::before{background:var(--terra);}
+    .dc-badge.pending{background:#fff;color:var(--terra);font-weight:500;display:inline-flex;align-items:center;gap:4px;border:1px solid rgba(196,90,58,.3);}
+    .pending-note{font-size:10.5px;color:var(--ink-mid);margin-top:.1rem;}
     .domain-card.soon{cursor:default;opacity:.6;}
     .domain-card.soon:hover{border-color:var(--border);transform:none;}
     .domain-card.soon::before{background:var(--ink-light);}
@@ -433,21 +440,21 @@
       <!-- ACCUEIL -->
       <div class="page active" id="page-accueil">
         <div class="welcome">Bonjour, <span id="welcomeName">Marie</span></div>
-        <div class="sec-label">Formez-vous 5 mn par jour</div>
+        <div class="sec-label">En cours</div>
         <div class="domains-grid">
           <div class="domain-card d1" onclick="openModule('k11','Green Déclic : La crise de l\'eau')">
-            <div class="dc-head"><span class="dc-title">Green Déclic : La crise de l'eau</span><span class="dc-badge g">Disponible</span></div>
+            <div class="dc-head"><span class="dc-title">Green Déclic : La crise de l'eau</span><span class="dc-badge demo">Démo</span></div>
             <div class="tags"><span class="tag">Transition écologique</span><span class="tag">Eau</span><span class="tag">3 séquences</span></div>
             <div class="prog-row"><div class="prog-bar"><div class="prog-fill g" style="width:0%"></div></div><span class="prog-pct">Commencer</span></div>
           </div>
-          <div class="domain-card d2 soon">
-            <div class="dc-head"><span class="dc-title">Blue Déclic : Performance numérique et IA</span><span class="dc-badge soon">Bientôt</span></div>
-            <div class="tags"><span class="tag">Numérique</span><span class="tag">IA</span></div>
-          </div>
           <div class="domain-card d1" onclick="openModule('sigys','Onboarding SIGYS')">
-            <div class="dc-head"><span class="dc-title">Onboarding SIGYS</span><span class="dc-badge g">Disponible</span></div>
+            <div class="dc-head"><span class="dc-title">Onboarding SIGYS</span><span class="dc-badge demo">Démo</span></div>
             <div class="tags"><span class="tag">Savoir-faire interne</span><span class="tag">Intégration</span><span class="tag">3 séquences</span></div>
             <div class="prog-row"><div class="prog-bar"><div class="prog-fill g" style="width:0%"></div></div><span class="prog-pct">Commencer</span></div>
+          </div>
+          <div class="domain-card pending">
+            <div class="dc-head"><span class="dc-title">Le tournage sur bois</span><span class="dc-badge pending"><i class="ti ti-clock-hour-4"></i>En validation</span></div>
+            <div class="pending-note">Votre partage a été soumis au Knowledge Master. Vous serez notifié dès qu'il sera validé.</div>
           </div>
         </div>
       </div>
@@ -456,8 +463,8 @@
       <div class="page" id="page-formation">
         <div class="page-title">Me former</div>
         <div class="sec-label">Disponible maintenant</div>
-        <div class="parcours-item" onclick="openModule('k11','Green Déclic : La crise de l\'eau')"><div class="parcours-ico"><i class="ti ti-droplet"></i></div><span class="parcours-name">Green Déclic : La crise de l'eau</span><span class="parcours-prog">3 séquences</span></div>
-        <div class="parcours-item" onclick="openModule('sigys','Onboarding SIGYS')"><div class="parcours-ico"><i class="ti ti-door-enter"></i></div><span class="parcours-name">Onboarding SIGYS</span><span class="parcours-prog">3 séquences</span></div>
+        <div class="parcours-item" onclick="openModule('k11','Green Déclic : La crise de l\'eau')"><div class="parcours-ico"><i class="ti ti-droplet"></i></div><span class="parcours-name">Green Déclic : La crise de l'eau</span><span class="parcours-prog">Démo</span></div>
+        <div class="parcours-item" onclick="openModule('sigys','Onboarding SIGYS')"><div class="parcours-ico"><i class="ti ti-door-enter"></i></div><span class="parcours-name">Onboarding SIGYS</span><span class="parcours-prog">Démo</span></div>
         <div class="sec-label" style="margin-top:.9rem;">Bientôt disponible</div>
         <div class="theme-item soon"><div class="theme-ico"><i class="ti ti-bolt"></i></div><div class="theme-info"><div class="theme-name">Blue Déclic : Performance numérique et IA</div><div class="theme-domain">Collection numérique</div></div><span class="soon-badge">Bientôt</span></div>
         <div class="theme-item soon"><div class="theme-ico"><i class="ti ti-world"></i></div><div class="theme-info"><div class="theme-name">Nouveau Monde : Écologie et numérique</div><div class="theme-domain">Collection premium</div></div><span class="soon-badge">Bientôt</span></div>
