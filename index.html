@@ -113,6 +113,7 @@
     .theme-domain{font-size:11px;color:var(--ink-light);}
     .theme-prog{display:flex;align-items:center;gap:6px;width:90px;}
     .done-label{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-light);margin:1rem 0 .5rem;font-weight:500;}
+    .done-banner{font-family:var(--font-display);font-size:18px;color:var(--foret);text-align:center;background:var(--foret-light);border:1px solid rgba(31,74,58,.18);border-radius:14px;padding:1rem 1.25rem;margin:1.25rem auto .5rem;max-width:320px;letter-spacing:.02em;}
 
     /* CHAT COMMUN */
     .chat-win{background:white;border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;height:calc(100vh - 200px);}
@@ -443,9 +444,10 @@
             <div class="dc-head"><span class="dc-title">Blue Déclic : Performance numérique et IA</span><span class="dc-badge soon">Bientôt</span></div>
             <div class="tags"><span class="tag">Numérique</span><span class="tag">IA</span></div>
           </div>
-          <div class="domain-card d1 soon">
-            <div class="dc-head"><span class="dc-title">Onboarding : nouveau collaborateur</span><span class="dc-badge soon">Bientôt</span></div>
-            <div class="tags"><span class="tag">Savoir-faire interne</span><span class="tag">Intégration</span></div>
+          <div class="domain-card d1" onclick="openModule('sigys','Onboarding SIGYS')">
+            <div class="dc-head"><span class="dc-title">Onboarding SIGYS</span><span class="dc-badge g">Disponible</span></div>
+            <div class="tags"><span class="tag">Savoir-faire interne</span><span class="tag">Intégration</span><span class="tag">3 séquences</span></div>
+            <div class="prog-row"><div class="prog-bar"><div class="prog-fill g" style="width:0%"></div></div><span class="prog-pct">Commencer</span></div>
           </div>
         </div>
       </div>
@@ -455,10 +457,10 @@
         <div class="page-title">Me former</div>
         <div class="sec-label">Disponible maintenant</div>
         <div class="parcours-item" onclick="openModule('k11','Green Déclic : La crise de l\'eau')"><div class="parcours-ico"><i class="ti ti-droplet"></i></div><span class="parcours-name">Green Déclic : La crise de l'eau</span><span class="parcours-prog">3 séquences</span></div>
+        <div class="parcours-item" onclick="openModule('sigys','Onboarding SIGYS')"><div class="parcours-ico"><i class="ti ti-door-enter"></i></div><span class="parcours-name">Onboarding SIGYS</span><span class="parcours-prog">3 séquences</span></div>
         <div class="sec-label" style="margin-top:.9rem;">Bientôt disponible</div>
         <div class="theme-item soon"><div class="theme-ico"><i class="ti ti-bolt"></i></div><div class="theme-info"><div class="theme-name">Blue Déclic : Performance numérique et IA</div><div class="theme-domain">Collection numérique</div></div><span class="soon-badge">Bientôt</span></div>
         <div class="theme-item soon"><div class="theme-ico"><i class="ti ti-world"></i></div><div class="theme-info"><div class="theme-name">Nouveau Monde : Écologie et numérique</div><div class="theme-domain">Collection premium</div></div><span class="soon-badge">Bientôt</span></div>
-        <div class="theme-item soon"><div class="theme-ico"><i class="ti ti-door-enter"></i></div><div class="theme-info"><div class="theme-name">Onboarding : nouveau collaborateur</div><div class="theme-domain">Savoir-faire interne</div></div><span class="soon-badge">Bientôt</span></div>
         <div class="theme-item soon"><div class="theme-ico"><i class="ti ti-tools"></i></div><div class="theme-info"><div class="theme-name">Gestes métier et sécurité</div><div class="theme-domain">Savoir-faire interne</div></div><span class="soon-badge">Bientôt</span></div>
       </div>
 
@@ -713,7 +715,7 @@ async function playMoment(action, start){
     const data=await res.json();hideTyping();
     agentTyping=false;updateAgentSend();
     if(data.error){ addMsg('agent','Erreur : '+data.error); return; }
-    if(data.done){ return; }
+    if(data.done){ showDemoEnd(); return; }
     if(typeof data.index==='number') currentIndex=data.index;
     // état dragdrop multi-parties
     if(typeof data.ddPart==='number') currentDdPart=data.ddPart; else currentDdPart=0;
@@ -791,6 +793,18 @@ function renderKit(file){
   a.appendChild(img);mediaWrap.appendChild(a);row.appendChild(mediaWrap);
   card.appendChild(row);
   addArtifact(card);
+  document.getElementById('agentQR').innerHTML='';
+  showDemoEnd();
+}
+
+// Message de clôture « démo terminée ». Affiché une seule fois (anti-doublon),
+// à la fin de la SYNTHESE (après le kit) et en filet de sécurité sur done.
+function showDemoEnd(){
+  if(document.getElementById('demoEndBanner')) return;
+  const msgs=document.getElementById('agentMsgs');if(!msgs)return;
+  const div=document.createElement('div');div.className='done-banner';div.id='demoEndBanner';
+  div.textContent='Démo terminée';
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
   document.getElementById('agentQR').innerHTML='';
 }
 
