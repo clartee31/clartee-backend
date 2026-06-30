@@ -226,6 +226,9 @@
     .art-fb.ok{background:var(--foret-light);color:var(--foret);}
     .art-fb.ko{background:var(--terra-light);color:var(--terra);}
     .art-source{margin-top:6px;font-size:11px;color:var(--ink-light);}
+    .qcm-fb-media,.dd-fb-media{margin-top:10px;background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;flex-direction:column;align-items:center;}
+    .qcm-fb-media img,.dd-fb-media img{max-width:100%;max-height:240px;height:auto;display:block;border-radius:4px;}
+    .qcm-fb-cap{font-size:11px;color:var(--ink-light);margin-top:6px;text-align:center;}
     .art-source a{color:var(--ink-mid);text-decoration:underline;text-underline-offset:2px;}
     .art-source a:hover{color:var(--terra);}
 
@@ -440,7 +443,7 @@
       <!-- ACCUEIL -->
       <div class="page active" id="page-accueil">
         <div class="welcome">Bonjour, <span id="welcomeName">Marie</span></div>
-        <div class="sec-label">En cours</div>
+        <div class="sec-label">Formations en cours</div>
         <div class="domains-grid">
           <div class="domain-card d1" onclick="openModule('k11','Green Déclic : La crise de l\'eau')">
             <div class="dc-head"><span class="dc-title">Green Déclic : La crise de l'eau</span><span class="dc-badge demo">Démo</span></div>
@@ -452,6 +455,9 @@
             <div class="tags"><span class="tag">Savoir-faire interne</span><span class="tag">Intégration</span><span class="tag">3 séquences</span></div>
             <div class="prog-row"><div class="prog-bar"><div class="prog-fill g" style="width:0%"></div></div><span class="prog-pct">Commencer</span></div>
           </div>
+        </div>
+        <div class="sec-label" style="margin-top:1.1rem;">Partages d'expertises en cours</div>
+        <div class="domains-grid">
           <div class="domain-card pending">
             <div class="dc-head"><span class="dc-title">Le tournage sur bois</span><span class="dc-badge pending"><i class="ti ti-clock-hour-4"></i>En validation</span></div>
             <div class="pending-note">Votre partage a été soumis au Knowledge Master. Vous serez notifié dès qu'il sera validé.</div>
@@ -883,6 +889,14 @@ function renderQCM(data){
       const ok=(i===data.correct);
       const fb=document.createElement('div');fb.className='art-fb '+(ok?'ok':'ko');
       fb.textContent=(ok?'✓ ':'✗ ')+(data.explanation||'');wrap.appendChild(fb);
+      if(data.feedbackMedia){
+        const fm=document.createElement('div');fm.className='qcm-fb-media';
+        const fimg=document.createElement('img');fimg.src=resolveMedia(data.feedbackMedia);fimg.alt=data.feedbackCaption||'';
+        fimg.onerror=()=>{fm.style.display='none';};
+        fm.appendChild(fimg);
+        if(data.feedbackCaption){const cap=document.createElement('div');cap.className='qcm-fb-cap';cap.textContent=data.feedbackCaption;fm.appendChild(cap);}
+        wrap.appendChild(fm);
+      }
       const sl=sourceLink(data);if(sl)wrap.appendChild(sl);
       // L'agent reformule la notion puis propose Continuer/Me réexpliquer (géré côté script)
       setTimeout(()=>setQR(['Continuer']),700);
@@ -896,10 +910,11 @@ function renderQCM(data){
 function renderVignette(data){
   const card=document.createElement('div');card.className='art-vignette';
   const row=document.createElement('div');row.className='vig-row';
+  if(data.mediaSide==='left'){row.style.flexDirection='row-reverse';}
 
   const body=document.createElement('div');body.className='vig-body';
   if(data.title){const t=document.createElement('div');t.className='vig-title';t.textContent=data.title;body.appendChild(t);}
-  if(data.text){const p=document.createElement('div');p.className='vig-text';p.textContent=data.text;body.appendChild(p);}
+  if(data.text){const p=document.createElement('div');p.className='vig-text';p.innerHTML=typeof marked!=='undefined'?marked.parse(data.text):data.text;body.appendChild(p);}
   if(data.caption||data.source){
     const c=document.createElement('div');c.className='vig-caption';
     let txt=(data.caption||'');
@@ -937,7 +952,7 @@ function renderTexte(data){
   const card=document.createElement('div');card.className='art-texte';
   const body=document.createElement('div');body.className='txt-body';
   if(data.title){const t=document.createElement('div');t.className='txt-title';t.textContent=data.title;body.appendChild(t);}
-  if(data.text){const p=document.createElement('div');p.className='txt-para';p.textContent=data.text;body.appendChild(p);}
+  if(data.text){const p=document.createElement('div');p.className='txt-para';p.innerHTML=typeof marked!=='undefined'?marked.parse(data.text):data.text;body.appendChild(p);}
   if(data.source){
     const c=document.createElement('div');c.className='txt-caption';
     if(data.sourceUrl){
@@ -975,9 +990,9 @@ function renderDragDrop(data){
   pool.addEventListener('drop',e=>{e.preventDefault();if(dragged){pool.appendChild(dragged);dragged=null;}});
   wrap.appendChild(pool);
 
-  // zones cibles (ordre mélangé pour ne pas aligner zone et bonne réponse)
+  // zones cibles. En mode reorder, on garde l'ordre fixe (1→5) ; sinon on mélange pour ne pas aligner zone et bonne réponse.
   const targets=document.createElement('div');targets.className='dd-targets';
-  const shuffledTargets=[...(data.targets||[])].sort(()=>Math.random()-0.5);
+  const shuffledTargets=data.reorder?[...(data.targets||[])]:[...(data.targets||[])].sort(()=>Math.random()-0.5);
   shuffledTargets.forEach(target=>{
     const row=document.createElement('div');row.className='dd-target';row.dataset.target=target;
     const tl=document.createElement('span');tl.className='dd-target-label';tl.textContent=target;
@@ -1034,6 +1049,12 @@ function renderDragDrop(data){
     btn.disabled=true;btn.style.opacity='.5';btn.style.pointerEvents='none';
     const fb=document.createElement('div');fb.className='art-fb '+(allOk?'ok':'ko');
     fb.textContent=(allOk?'✓ ':'✗ ')+(data.explanation||'');wrap.appendChild(fb);
+    if(data.media){
+      const fm=document.createElement('div');fm.className='dd-fb-media';
+      const fimg=document.createElement('img');fimg.src=resolveMedia(data.media);fimg.alt='';
+      fimg.onerror=()=>{fm.style.display='none';};
+      fm.appendChild(fimg);wrap.appendChild(fm);
+    }
     const sl=sourceLink(data);if(sl)wrap.appendChild(sl);
     if(!allOk){
       // bouton de correction : replace les étiquettes au bon endroit

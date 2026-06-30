@@ -25,6 +25,8 @@ INTRO_SEQUENCE_3
 TRANSMETTRE_notion3.1_TEXTE
        
 EVALUER_notion3.2_DRAGDROP
+INSTRUCTION = Associez chaque quantité d'eau au bon produit, puis validez.
+EXPLICATION = Ces valeurs sont des moyennes sur la production mondiale, à comparer à une douche de 5 minutes (100 litres).
 PAIRES = Tasse de café:140 litres | Bol de riz:250 litres | T-shirt:2700 litres | Steak de boeuf (200g):3100 litres | Paire de baskets:8000 litres | Téléphone mobile:12760 litres
 
 SYNTHESE

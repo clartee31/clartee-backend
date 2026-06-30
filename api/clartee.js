@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════
-//  CLARTÉE — MOTEUR PÉDAGOGIQUE (clartee.js)
+//  CLARTÉE : MOTEUR PÉDAGOGIQUE (clartee.js)
 //  Le COMMENT : IP Clartée, moteur générique stable.
 //  Charge kb-{code}.md + script-{code}.md, assemble le prompt système,
 //  impose strictement les 5 artefacts validés. Backend Vercel + Mistral.
@@ -58,6 +58,10 @@ function parseKB(raw) {
       continue;
     }
 
+    if ((m = line.match(/^MediaSide\s*=\s*(\w+)/i))) {
+      if (currentNotion) currentNotion.mediaSide = /^(gauche|left)$/i.test(m[1]) ? 'left' : 'right';
+      continue;
+    }
     if ((m = line.match(mediaRe))) {
       if (currentNotion) { currentNotion.media = m[1]; currentNotion.mediaLegende = m[2] || null; }
       else { kb.media = m[1]; kb.mediaLegende = m[2] || null; }
@@ -65,7 +69,7 @@ function parseKB(raw) {
     }
     if ((m = line.match(notionRe))) {
       pushNotion();
-      currentNotion = { id: m[1], sequence: currentSeq, source: m[2], texte: '', media: null, mediaLegende: null, complement: null, complementSource: null };
+      currentNotion = { id: m[1], sequence: currentSeq, source: m[2], texte: '', media: null, mediaLegende: null, mediaSide: 'right', complement: null, complementSource: null };
       captureComplement = false; continue;
     }
     if ((m = line.match(complementRe))) {
@@ -109,7 +113,7 @@ function parseScript(raw) {
     if ((m = line.match(/^EVALUER_notion([\d.]+)_(\w+)$/i))) {
       const a = m[2].toUpperCase(); pushMoment({ type: 'EVALUER', notion: m[1], artefact: a, artefactValide: ARTEFACTS.includes(a) }); continue;
     }
-    if ((m = line.match(/^(QUESTION|REPONSE_OK|REPONSE_KO|FEEDBACK_OK|FEEDBACK_KO|PAIRES)\s*=\s*(.+)$/i))) {
+    if ((m = line.match(/^(QUESTION|REPONSE_OK|REPONSE_KO|FEEDBACK_OK|FEEDBACK_KO|FEEDBACK_MEDIA|FEEDBACK_CAPTION|PAIRES|INSTRUCTION|EXPLICATION|MEDIA|GROUPSIZE|REORDER)\s*=\s*(.+)$/i))) {
       if (current) {
         const key = m[1].toUpperCase();
         if (key === 'REPONSE_KO') current[key] = cleanVal(m[2]).split('|').map(s => cleanVal(s)).filter(Boolean);
@@ -121,6 +125,8 @@ function parseScript(raw) {
             return { label: p.slice(0, idx).trim(), value: p.slice(idx + 1).trim() };
           }).filter(Boolean);
         }
+        else if (key === 'GROUPSIZE') current.GROUPSIZE = parseInt(cleanVal(m[2]), 10) || null;
+        else if (key === 'REORDER') current.REORDER = /^(oui|true|1|yes)$/i.test(cleanVal(m[2]));
         else current[key] = cleanVal(m[2]);
       }
       continue;
@@ -179,8 +185,9 @@ function sourceInfo(kb, code) {
 }
 
 // Construit un artefact DRAGDROP déterministe à partir de paires imposées, pour une "partie" donnée.
-// Découpe en groupes de 3. Renvoie { json, totalParts }.
-function buildDragDropPart(pairs, part, src, groupSize) {
+// opts = { instruction, explication, media, reorder }. Découpe en groupes de `groupSize`.
+function buildDragDropPart(pairs, part, src, groupSize, opts) {
+  const o = opts || {};
   const size = groupSize || 3;
   const totalParts = Math.ceil(pairs.length / size);
   const slice = pairs.slice(part * size, part * size + size);
@@ -189,11 +196,14 @@ function buildDragDropPart(pairs, part, src, groupSize) {
   const solution = {};
   slice.forEach(p => { solution[p.value] = p.label; });
   const suffix = totalParts > 1 ? ` (partie ${part + 1}/${totalParts})` : '';
+  const baseInstr = o.instruction || 'Associez chaque étiquette à la bonne zone, puis validez.';
   const json = {
     type: 'dragdrop',
-    instruction: `Associez chaque quantité d'eau au bon produit, puis validez.${suffix}`,
+    instruction: `${baseInstr}${suffix}`,
     items, targets, solution,
-    explanation: `Ces valeurs sont des moyennes sur la production mondiale, à comparer à une douche de 5 minutes (100 litres).`,
+    reorder: !!o.reorder,
+    explanation: o.explication || '',
+    media: o.media || null,
     source: src && src.label ? src.label : '',
     sourceUrl: src && src.url ? src.url : ''
   };
@@ -271,7 +281,8 @@ function getMomentInstruction(kb, script, index, action) {
     if (type === 'VIGNETTE') {
       instr += `Média à afficher (champ "media") : "${n.media || ''}"\n`;
       instr += `Légende (champ "caption") : "${n.mediaLegende || ''}"\n`;
-      instr += `\nProduis : {"type":"vignette","title":"<titre court de la notion>","text":"<le contenu de la notion, fidèle, reformulé clairement mais SANS changer les chiffres ni le sens>","media":"${n.media || ''}","caption":"${n.mediaLegende || ''}","source":"${srcLabel}","sourceUrl":"${srcUrl}","more":${hasP2}}`;
+      instr += `Côté du média (champ "mediaSide") : "${n.mediaSide || 'right'}" (recopie tel quel)\n`;
+      instr += `\nProduis : {"type":"vignette","title":"<titre court de la notion>","text":"<le contenu de la notion, fidèle, reformulé clairement mais SANS changer les chiffres ni le sens>","media":"${n.media || ''}","caption":"${n.mediaLegende || ''}","mediaSide":"${n.mediaSide || 'right'}","source":"${srcLabel}","sourceUrl":"${srcUrl}","more":${hasP2}}`;
     } else {
       instr += `\nProduis : {"type":"texte","title":"<titre court de la notion>","text":"<le contenu de la notion, fidèle, SANS changer les chiffres ni le sens>","source":"${srcLabel}","sourceUrl":"${srcUrl}","more":${hasP2}}`;
     }
@@ -315,7 +326,8 @@ const BASE_RULES = `Tu es Clartée, agent pédagogique. Règles absolues :
 - Tu n'inventes aucun chiffre : tu reprends fidèlement le contenu fourni.
 - Tu n'utilises JAMAIS le tiret cadratin (utilise virgule, deux-points, parenthèses).
 - Tu ne joues que le moment demandé, puis tu t'arrêtes.
-- LISIBILITÉ (messages texte uniquement) : termine chaque phrase par un retour à la ligne. Pour une liste (numérotée ou à puces), mets un retour à la ligne avant chaque élément, chaque élément sur sa propre ligne. Ces règles de mise en forme ne s'appliquent PAS au contenu d'un artefact JSON.`;
+- LISIBILITÉ (messages texte uniquement) : termine chaque phrase par un retour à la ligne. Pour une liste (numérotée ou à puces), mets un retour à la ligne avant chaque élément, chaque élément sur sa propre ligne. Ces règles de mise en forme ne s'appliquent PAS au contenu d'un artefact JSON.
+- LISTES NUMÉROTÉES : dès qu'un contenu énumère plusieurs éléments distincts (valeurs, règles, étapes, principes, dimensions), présente-les TOUJOURS sous forme de liste numérotée markdown (1., 2., 3., ...), un élément par ligne, plutôt qu'en texte continu ou à puces. Cela vaut aussi bien pour un message texte que pour le champ "text" d'un artefact vignette ou texte.`;
 
 // Construit les messages pour Mistral pour un moment donné
 function buildMomentMessages(kb, script, index, action) {
@@ -381,7 +393,7 @@ function mistralRequest(messages) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-//  HANDLER VERCEL — piloté moment par moment
+//  HANDLER VERCEL : piloté moment par moment
 // ─────────────────────────────────────────────────────────────────────
 async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -457,7 +469,14 @@ async function handler(req, res) {
     const n = findNotion(kb, moment.notion);
     const src = n ? sourceInfo(kb, n.source) : { label: '', url: '' };
     const part = Number.isInteger(body.ddPart) ? body.ddPart : 0;
-    const { json, totalParts } = buildDragDropPart(moment.PAIRES, part, src, 3);
+    const gsize = moment.GROUPSIZE || 3;
+    const opts = {
+      instruction: moment.INSTRUCTION || null,
+      explication: moment.EXPLICATION || null,
+      media: moment.MEDIA || null,
+      reorder: !!moment.REORDER
+    };
+    const { json, totalParts } = buildDragDropPart(moment.PAIRES, part, src, gsize, opts);
     res.status(200).json({
       content: [{ text: JSON.stringify(json) }],
       index: playIndex,
@@ -474,7 +493,34 @@ async function handler(req, res) {
 
   const messages = buildMomentMessages(kb, script, playIndex, action);
   try {
-    const text = await mistralRequest(messages);
+    let text = await mistralRequest(messages);
+    // Injection serveur d'une image de feedback pour un QCM (champ FEEDBACK_MEDIA du script), garantie même si Mistral l'omet.
+    if (moment.type === 'EVALUER' && moment.FEEDBACK_MEDIA) {
+      try {
+        const mjson = JSON.parse(text);
+        if (mjson && typeof mjson === 'object') {
+          mjson.feedbackMedia = moment.FEEDBACK_MEDIA;
+          if (moment.FEEDBACK_CAPTION) mjson.feedbackCaption = moment.FEEDBACK_CAPTION;
+          text = JSON.stringify(mjson);
+        }
+      } catch (e) { /* si la réponse n'est pas un JSON pur, on ne touche pas */ }
+    }
+    // Fiabilisation serveur de la vignette : on garantit media / caption / mediaSide depuis la KB.
+    if (moment.type === 'TRANSMETTRE' && moment.artefact === 'VIGNETTE') {
+      const nv = findNotion(kb, moment.notion);
+      const a = (action || '').toLowerCase();
+      if (nv && !a.includes('savoir plus')) {
+        try {
+          const mjson = JSON.parse(text);
+          if (mjson && typeof mjson === 'object' && mjson.type === 'vignette') {
+            if (nv.media) mjson.media = nv.media;
+            if (nv.mediaLegende) mjson.caption = nv.mediaLegende;
+            mjson.mediaSide = nv.mediaSide || 'right';
+            text = JSON.stringify(mjson);
+          }
+        } catch (e) { /* réponse non-JSON : on ne touche pas */ }
+      }
+    }
     res.status(200).json({
       content: [{ text }],
       index: playIndex,
