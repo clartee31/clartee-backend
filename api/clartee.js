@@ -40,7 +40,11 @@ function parseKB(raw) {
 
     let m;
     if ((m = line.match(/^Module\s+(\w+)/i))) { kb.module = m[1]; currentSection = 'module'; continue; }
-    if ((m = line.match(/^Titre\s*=\s*(.+)$/i))) { kb.titre = m[1].trim(); continue; }
+    if ((m = line.match(/^Titre\s*=\s*(.+)$/i))) {
+      if (currentNotion) currentNotion.titre = m[1].trim();
+      else kb.titre = m[1].trim();
+      continue;
+    }
     if ((m = line.match(/^Mise à jour\s*=\s*(.+)$/i))) { kb.miseAJour = m[1].trim(); continue; }
     if ((m = line.match(seqRe))) { kb.sequences[m[1]] = m[2].trim(); continue; }
     if ((m = line.match(/^Notions de la séquence\s+(\d+)/i))) { pushNotion(); currentSeq = m[1]; currentSection = 'notions'; captureComplement = false; continue; }
@@ -69,7 +73,7 @@ function parseKB(raw) {
     }
     if ((m = line.match(notionRe))) {
       pushNotion();
-      currentNotion = { id: m[1], sequence: currentSeq, source: m[2], texte: '', media: null, mediaLegende: null, mediaSide: 'right', complement: null, complementSource: null };
+      currentNotion = { id: m[1], sequence: currentSeq, source: m[2], titre: null, texte: '', media: null, mediaLegende: null, mediaSide: 'right', complement: null, complementSource: null };
       captureComplement = false; continue;
     }
     if ((m = line.match(complementRe))) {
@@ -191,6 +195,22 @@ function sourceInfo(kb, code) {
   // Retirer astérisques markdown et guillemets typographiques superflus en bord
   label = label.replace(/\*+/g, '').replace(/^["“”']+|["“”']+$/g, '').replace(/[\s,.*]+$/, '').trim();
   return { label, url: s.url || null };
+}
+
+// Normalise une liste numérotée écrite "en ligne" (ex : "... : 1. a 2. b 3. c.") en
+// liste markdown multi-lignes, pour que le rendu client (marked) produise un vrai <ol>.
+// Détecte au moins deux marqueurs "N." pour éviter de couper une phrase contenant un nombre.
+function normalizeNumberedList(text) {
+  if (!text || typeof text !== 'string') return text;
+  // Compte les marqueurs de type "1." "2." précédés d'un espace ou en début
+  const markers = text.match(/(^|\s)(\d+)\.\s/g);
+  if (!markers || markers.length < 2) return text;
+  // Insère un saut de ligne avant chaque "N. " (sauf s'il est déjà en début de ligne)
+  let out = text.replace(/\s+(\d+)\.\s+/g, '\n$1. ');
+  // Si le tout premier item colle à une intro ("intro : 1. ..."), garder l'intro sur sa ligne :
+  // le remplacement ci-dessus a déjà mis un \n avant "1." si précédé d'espace. On nettoie les espaces résiduels.
+  out = out.replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n');
+  return out.trim();
 }
 
 // Construit un artefact DRAGDROP déterministe à partir de paires imposées, pour une "partie" donnée.
@@ -479,10 +499,13 @@ async function handler(req, res) {
     const src = n ? sourceInfo(kb, n.source) : { label: '', url: '' };
     const part = Number.isInteger(body.ddPart) ? body.ddPart : 0;
     const gsize = moment.GROUPSIZE || 3;
+    const nbParts = Math.ceil(moment.PAIRES.length / gsize);
+    const isLastPart = part >= nbParts - 1;
     const opts = {
       instruction: moment.INSTRUCTION || null,
       explication: moment.EXPLICATION || null,
-      media: moment.MEDIA || null,
+      // L'image de feedback n'apparaît que sur la dernière partie (pas répétée à chaque partie).
+      media: isLastPart ? (moment.MEDIA || null) : null,
       reorder: !!moment.REORDER
     };
     const { json, totalParts } = buildDragDropPart(moment.PAIRES, part, src, gsize, opts);
@@ -500,21 +523,52 @@ async function handler(req, res) {
     return;
   }
 
-  // Cas spécial : "En savoir plus" sur une TRANSMETTRE => le complément vient de la KB (déterministe).
-  // On construit le JSON texte côté serveur, sans passer par Mistral : JSON.stringify échappe
-  // correctement apostrophes et retours à la ligne, ce qui évite tout JSON malformé côté client.
-  if (moment.type === 'TRANSMETTRE' && /savoir plus/i.test(action || '')) {
+  // TRANSMISSIONS (vignette / texte) construites côté serveur depuis la KB, sans passer par Mistral.
+  // Le contenu est déterministe : JSON.stringify échappe apostrophes et retours à la ligne,
+  // ce qui élimine tout risque de JSON malformé ou tronqué à l'affichage.
+  if (moment.type === 'TRANSMETTRE') {
     const n = findNotion(kb, moment.notion);
-    if (n && n.complement) {
-      const cSrc = sourceInfo(kb, n.complementSource || n.source);
-      const json = {
-        type: 'texte',
-        title: 'Pour aller plus loin',
-        text: n.complement,
-        source: cSrc.label || '',
-        sourceUrl: cSrc.url || '',
-        more: false
-      };
+    if (n) {
+      const wantsMore = /savoir plus/i.test(action || '');
+      let json;
+      if (wantsMore && n.complement) {
+        const cSrc = sourceInfo(kb, n.complementSource || n.source);
+        json = {
+          type: 'texte',
+          title: 'Pour aller plus loin',
+          text: normalizeNumberedList(n.complement),
+          source: cSrc.label || '',
+          sourceUrl: cSrc.url || '',
+          more: false
+        };
+      } else {
+        const src = sourceInfo(kb, n.source);
+        const hasP2 = !!n.complement;
+        const title = n.titre || (kb.sequences[n.sequence] || 'À retenir');
+        const body = normalizeNumberedList(n.texte);
+        if (moment.artefact === 'VIGNETTE') {
+          json = {
+            type: 'vignette',
+            title,
+            text: body,
+            media: n.media || '',
+            caption: n.mediaLegende || '',
+            mediaSide: n.mediaSide || 'right',
+            source: src.label || '',
+            sourceUrl: src.url || '',
+            more: hasP2
+          };
+        } else {
+          json = {
+            type: 'texte',
+            title,
+            text: body,
+            source: src.label || '',
+            sourceUrl: src.url || '',
+            more: hasP2
+          };
+        }
+      }
       res.status(200).json({
         content: [{ text: JSON.stringify(json) }],
         index: playIndex,
@@ -541,7 +595,8 @@ async function handler(req, res) {
         }
       } catch (e) { /* si la réponse n'est pas un JSON pur, on ne touche pas */ }
     }
-    // Fiabilisation serveur de la vignette : on garantit media / caption / mediaSide depuis la KB.
+    // Fiabilisation serveur de la vignette : on garantit media / caption / mediaSide depuis la KB,
+    // et on normalise les listes numérotées inline en listes markdown multi-lignes.
     if (moment.type === 'TRANSMETTRE' && moment.artefact === 'VIGNETTE') {
       const nv = findNotion(kb, moment.notion);
       const a = (action || '').toLowerCase();
@@ -552,6 +607,20 @@ async function handler(req, res) {
             if (nv.media) mjson.media = nv.media;
             if (nv.mediaLegende) mjson.caption = nv.mediaLegende;
             mjson.mediaSide = nv.mediaSide || 'right';
+            if (mjson.text) mjson.text = normalizeNumberedList(mjson.text);
+            text = JSON.stringify(mjson);
+          }
+        } catch (e) { /* réponse non-JSON : on ne touche pas */ }
+      }
+    }
+    // Même normalisation pour les transmissions en artefact TEXTE (sans média).
+    if (moment.type === 'TRANSMETTRE' && moment.artefact !== 'VIGNETTE') {
+      const a = (action || '').toLowerCase();
+      if (!a.includes('savoir plus')) {
+        try {
+          const mjson = JSON.parse(text);
+          if (mjson && typeof mjson === 'object' && mjson.type === 'texte' && mjson.text) {
+            mjson.text = normalizeNumberedList(mjson.text);
             text = JSON.stringify(mjson);
           }
         } catch (e) { /* réponse non-JSON : on ne touche pas */ }
